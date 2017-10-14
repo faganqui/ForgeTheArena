@@ -47,7 +47,7 @@ public class LoadFromDatabase extends AppCompatActivity {
     private static final String SECOND_WEAPON_STATS = "stats2";
     private static final String THIRD_WEAPON_STATS = "stats3";
 
-    private static final String OWNED_WEAPONS = "gimmeweapons";
+    private static final String OWNED_WEAPONS = "ownedweapons";
     private static final String AVAILIBLE_CURRENCY = "moneymoneymoney";
 
     String[] stat_array = new String[17];

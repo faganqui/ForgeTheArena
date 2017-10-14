@@ -88,7 +88,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
     String stringAmulet;
 
     //locations of items for ease of saving
-    String[] stat_array = new String[14];
+    String[] stat_array = new String[15];
     int save_index = 0;
 
     //interface objects
@@ -135,6 +135,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         stat_array[11] = FIRST_WEAPON_STATS;
         stat_array[12] = SECOND_WEAPON_STATS;
         stat_array[13] = THIRD_WEAPON_STATS;
+        stat_array[14] = OWNED_WEAPONS;
 
         //load interface objects
         displayNameInput = findViewById(R.id.DisplayEditText);
@@ -193,6 +194,26 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
                 changeOutfitButton(0, true);
                 break;
 
+            //change weapon buttons
+            case (R.id.next_weapon_switch):
+                changeWeaponButton(0, true);
+                break;
+            case (R.id.next_weapon_switch_1):
+                changeWeaponButton(1, true);
+                break;
+            case (R.id.next_weapon_switch_2):
+                changeWeaponButton(2, true);
+                break;
+            case (R.id.prev_weapon_switch):
+                changeWeaponButton(0, false);
+                break;
+            case (R.id.prev_weapon_switch_1):
+                changeWeaponButton(1, false);
+                break;
+            case (R.id.prev_weapon_switch_2):
+                changeWeaponButton(2, false);
+                break;
+
             default:
                 //change stat buttons
                 if (view.getId() >= 100 && view.getId() <= 200){
@@ -221,12 +242,19 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
 
     public void savetoDatabase(){
         //save all changes to database
+        String weapons = "";
+        for (String weapon: ownedWeapons){
+            weapons += weapon + "]";
+        }
+        weapons = weapons.substring(0,weapons.length()-2);
+
         String[] values = {String.valueOf(displayNameInput.getText()),
                 playerOneWeaponLocations[0],playerOneWeaponLocations[1],playerOneWeaponLocations[2],
                 stringPlayerOne[0], stringPlayerOne[1], stringPlayerOne[2],
                 stringGem[0],stringGem[1],stringGem[2],
                 stringAmulet,
-                playerOneStatString[0],playerOneStatString[1],playerOneStatString[2]
+                playerOneStatString[0],playerOneStatString[1],playerOneStatString[2],
+                weapons
         };
 
         if(save_index == values.length) {
@@ -254,31 +282,6 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         setStat(THIRD_WEAPON_STATS, playerOneStatString[2]);
         */
 
-    }
-
-
-    public String getEmojiByUnicode(int unicode){
-        return new String(Character.toChars(unicode));
-    }
-
-    public Bitmap getCombinedBitmap(Bitmap b, Bitmap b2, Bitmap b3) {
-        //returns a bitmap of b, b2, b3 overlayed ontop of each other
-        Bitmap drawnBitmap = null;
-
-        try {
-            drawnBitmap = Bitmap.createBitmap(600, 600, Bitmap.Config.ARGB_8888);
-
-            Canvas canvas = new Canvas(drawnBitmap);
-
-            canvas.drawBitmap(b, frameToDraw, whereToDraw, null);
-            canvas.drawBitmap(b2, frameToDraw, whereToDraw, null);
-            canvas.drawBitmap(b3, frameToDraw, whereToDraw, null);
-
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return drawnBitmap;
     }
 
     public void getSharedPrefs() {
@@ -312,8 +315,10 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         playerOneStatString[2] = sharedPref.getString(THIRD_WEAPON_STATS, "sword");
     }
 
+    /*helper function to set statistics*/
+
     public void setStat(String stat, String value){
-        // sets a specific statistic for a user
+        // sets a specific statistic for a user in the database
         DatabaseReference statData = database.getReference("/users/" + userId + "/" + stat);
         statData.setValue(value);
 
@@ -329,6 +334,111 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
 
             }
         });
+    }
+
+    public void changeWeaponButton(int weapon_index, Boolean isNext){
+        //changes local weapon pieces and displays them
+        int current_index;
+
+        current_index = Arrays.asList(ownedWeapons).indexOf(playerOneWeaponLocations[weapon_index] + "[" + playerOneStatString[weapon_index]);
+        if(isNext) {
+            current_index = (current_index + 1) % ownedWeapons.length;
+        }else{
+            if(current_index == 0){
+                current_index = ownedWeapons.length-1;
+            }else{
+                current_index--;
+            }
+        }
+        playerOneWeaponLocations[weapon_index] = ownedWeapons[current_index].split("\\[")[0];
+        playerOneStatString[weapon_index] = ownedWeapons[current_index].split("\\[")[1];
+
+        //update all held weapons
+        for(int weapon_held_index = 0; weapon_held_index < 3; weapon_held_index++){
+            if(playerOneWeaponLocations[weapon_held_index] == playerOneWeaponLocations[weapon_index]) {
+                playerOneStatString[weapon_held_index] = ownedWeapons[current_index].split("\\[")[1];
+            }
+        }
+
+        ImageView weaponView = findViewById(R.id.weapon_view + weapon_index);
+        weaponView.setImageBitmap(drawWeapon(weapon_index));
+    }
+
+    public void changeOutfitButton(int piece, boolean isNext){
+        //changes local outfit pieces and displays them
+        String[] temp_list;
+        int current_index;
+
+        temp_list = ownedOutfits[piece].split(",");
+        current_index = Arrays.asList(temp_list).indexOf(stringPlayerOne[piece]);
+        if(isNext) {
+            current_index = (current_index + 1) % temp_list.length;
+        }else{
+            if(current_index == 0){
+                current_index = temp_list.length-1;
+            }else{
+                current_index--;
+            }
+        }
+        stringPlayerOne[piece] = temp_list[current_index];
+        drawCharacter();
+    }
+
+
+    public void setWeaponStat(int weapon, int stat, Boolean isPlus){
+        //set the stat of a specific weapon locally - will be saved to database on activity exit
+        String[] cur_stats = playerOneStatString[weapon].split(",");
+        int cur_stat = Integer.valueOf(cur_stats[stat]);
+        if(isPlus){
+            cur_stat++;
+        }else{
+            cur_stat--;
+        }
+        cur_stats[stat] = String.valueOf(cur_stat);
+
+        String stats_string = "";
+        for(String temp_stat : cur_stats){
+            stats_string += (temp_stat + ",");
+        }
+
+        //update the weapon in owned weapons
+        int index_of_weapon = Arrays.asList(ownedWeapons).indexOf(playerOneWeaponLocations[weapon] + "[" + playerOneStatString[weapon]);
+        ownedWeapons[index_of_weapon] = ownedWeapons[index_of_weapon].split("\\[")[0] + "[" + stats_string;
+
+        //update all held weapons
+        for(int weapon_held_index = 0; weapon_held_index < 3; weapon_held_index++){
+            if(playerOneWeaponLocations[weapon_held_index] == playerOneWeaponLocations[weapon]) {
+                playerOneStatString[weapon_held_index] = stats_string;
+            }
+        }
+
+        setStatInterface();
+    }
+    /*end of methods to set statistics
+
+/* helper methods for drawing bitmaps or other character */
+    public String getEmojiByUnicode(int unicode){
+        return new String(Character.toChars(unicode));
+    }
+
+    public Bitmap getCombinedBitmap(Bitmap b, Bitmap b2, Bitmap b3) {
+        //returns a bitmap of b, b2, b3 overlayed ontop of each other
+        Bitmap drawnBitmap = null;
+
+        try {
+            drawnBitmap = Bitmap.createBitmap(600, 600, Bitmap.Config.ARGB_8888);
+
+            Canvas canvas = new Canvas(drawnBitmap);
+
+            canvas.drawBitmap(b, frameToDraw, whereToDraw, null);
+            canvas.drawBitmap(b2, frameToDraw, whereToDraw, null);
+            canvas.drawBitmap(b3, frameToDraw, whereToDraw, null);
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return drawnBitmap;
     }
 
     public void drawCharacter(){
@@ -363,25 +473,137 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         imageView.setImageBitmap(getCombinedBitmap(legs, body, head));
     }
 
-    public void setWeaponStat(int weapon, int stat, Boolean isPlus){
-        String[] cur_stats = playerOneStatString[weapon].split(",");
-        int cur_stat = Integer.valueOf(cur_stats[stat]);
-        if(isPlus){
-            cur_stat++;
-        }else{
-            cur_stat--;
+    public Bitmap drawWeapon(int index){
+        //load and scale the player
+        int resID = getResources().getIdentifier(playerOneWeaponLocations[index],
+                "drawable", getPackageName());
+        Bitmap weapon = BitmapFactory.decodeResource(this.getResources(), resID);
+
+        weapon = Bitmap.createScaledBitmap(weapon,
+                frameWidth * 5,
+                frameHeight,
+                false);
+
+        Bitmap drawnBitmap = Bitmap.createBitmap(600, 600, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(drawnBitmap);
+
+        canvas.drawBitmap(weapon, frameToDraw, whereToDraw, null);
+
+        return(drawnBitmap);
+    }
+/*end of drawing helper messages*/
+
+    public void onBackPressed(){
+        Intent intent = new Intent(this, LoadFromDatabase.class);
+        startActivity(intent);
+    }
+
+    public void setWeaponInterface(){
+        //allows user to change weapon
+        stuffLayout.removeAllViews();
+
+        TableLayout weaponSwitchTable= new TableLayout(this);
+
+        for (int weapon_index = 0; weapon_index < playerOneStatString.length; weapon_index++){
+            TableRow row = new TableRow(this);
+
+            Button prev_button = new Button(this);
+            Button next_button = new Button(this);
+
+            prev_button.setText("<");
+            next_button.setText(">");
+
+            ImageView weaponView = new ImageView(this);
+            weaponView.setImageBitmap(drawWeapon(weapon_index));
+
+            switch (weapon_index){
+                case 0:
+                    prev_button.setId(R.id.prev_weapon_switch);
+                    next_button.setId(R.id.next_weapon_switch);
+                    weaponView.setId(R.id.weapon_view);
+                    break;
+                case 1:
+                    prev_button.setId(R.id.prev_weapon_switch_1);
+                    next_button.setId(R.id.next_weapon_switch_1);
+                    weaponView.setId(R.id.weapon_view_1);
+                    break;
+                case 2:
+                    prev_button.setId(R.id.prev_weapon_switch_2);
+                    next_button.setId(R.id.next_weapon_switch_2);
+                    weaponView.setId(R.id.weapon_view_2);
+                    break;
+            }
+
+            prev_button.setOnClickListener(this);
+            next_button.setOnClickListener(this);
+
+            row.addView(prev_button);
+            row.addView(weaponView);
+            row.addView(next_button);
+
+            weaponSwitchTable.addView(row);
         }
-        cur_stats[stat] = String.valueOf(cur_stat);
 
-        String stats_string = "";
-        for(String temp_stat : cur_stats){
-            stats_string += (temp_stat + ",");
+        stuffLayout.addView(weaponSwitchTable);
+    }
+
+    public void setStatInterface(){
+        //allows user to change stats
+        stuffLayout.removeAllViews();
+
+        stuffLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        HorizontalScrollView hScrollView = new HorizontalScrollView(this);
+        LinearLayout hLayout = new LinearLayout(this);
+        hLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        for(int i = 0; i  < 3; i ++){
+            TableLayout tempColumnLayout = new TableLayout(this);
+
+            for(int j = 1; j < statsOrder.length; j++){
+                TableRow row = new TableRow(this);
+                TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
+                row.setLayoutParams(lp);
+                row.setGravity(Gravity.CENTER_VERTICAL);
+                //linear layout for the + button and number
+                LinearLayout temp_buttons = new LinearLayout(this);
+                temp_buttons.setOrientation(LinearLayout.VERTICAL);
+                temp_buttons.setGravity(Gravity.CENTER);
+
+                TextView tempStatTextView = new TextView(this);
+                TextView tempStatDataTextView = new TextView(this);
+                tempStatDataTextView.setGravity(Gravity.CENTER);
+                tempStatDataTextView.setTextSize(10);
+                tempStatTextView.setTextSize(10);
+
+                Button plus = new Button(this);
+                Button minus = new Button(this);
+                plus.setText("+");
+                minus.setText("-");
+
+                tempStatTextView.setText(statsOrder[j-1] + ": ");
+                tempStatDataTextView.setText(playerOneStatString[i].split(",")[j]);
+
+                plus.setId(100*(i+1) + j);
+                minus.setId(1000*(i+1) + j);
+
+                plus.setOnClickListener(this);
+                minus.setOnClickListener(this);
+
+                row.addView(tempStatTextView);
+                temp_buttons.addView(plus);
+                temp_buttons.addView(tempStatDataTextView);
+                temp_buttons.addView(minus);
+                row.addView(temp_buttons);
+                tempColumnLayout.addView(row);
+            }
+
+            hLayout.addView(tempColumnLayout);
         }
+        hScrollView.addView(hLayout);
+        stuffLayout.addView(hScrollView);
 
-        ownedWeapons[0] = ownedWeapons[0].split("\\[")[0] + stats_string;
-        playerOneStatString[weapon] = stats_string;
-
-        setStatInterface();
     }
 
     public void setOutfitInterface(){
@@ -443,94 +665,6 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         stuffLayout.addView(change_back_col);
         stuffLayout.addView(imageView);
         stuffLayout.addView(change_next_col);
-    }
-
-    public void changeOutfitButton(int piece, boolean isNext){
-        String[] temp_list;
-        int current_index;
-
-        temp_list = ownedOutfits[piece].split(",");
-        current_index = Arrays.asList(temp_list).indexOf(stringPlayerOne[piece]);
-        if(isNext) {
-            current_index = (current_index + 1) % temp_list.length;
-        }else{
-            if(current_index == 0){
-                current_index = temp_list.length-1;
-            }else{
-                current_index--;
-            }
-        }
-        stringPlayerOne[piece] = temp_list[current_index];
-        drawCharacter();
-    }
-
-    public void onBackPressed(){
-        Intent intent = new Intent(this, LoadFromDatabase.class);
-        startActivity(intent);
-    }
-
-    public void setWeaponInterface(){
-        //allows user to change weapon
-        stuffLayout.removeAllViews();
-
-    }
-
-    public void setStatInterface(){
-        //allows user to change stats
-        stuffLayout.removeAllViews();
-
-        stuffLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-        HorizontalScrollView hScrollView = new HorizontalScrollView(this);
-        LinearLayout hLayout = new LinearLayout(this);
-        hLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-        for(int i = 0; i  < 3; i ++){
-            TableLayout tempColumnLayout = new TableLayout(this);
-
-            for(int j = 1; j < statsOrder.length; j++){
-                TableRow row = new TableRow(this);
-                TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
-                row.setLayoutParams(lp);
-                row.setGravity(Gravity.CENTER_VERTICAL);
-                //linear layout for the + button and number
-                LinearLayout temp_buttons = new LinearLayout(this);
-                temp_buttons.setOrientation(LinearLayout.VERTICAL);
-                temp_buttons.setGravity(Gravity.CENTER);
-
-                TextView tempStatTextView = new TextView(this);
-                TextView tempStatDataTextView = new TextView(this);
-                tempStatDataTextView.setGravity(Gravity.CENTER);
-                tempStatDataTextView.setTextSize(10);
-                tempStatTextView.setTextSize(10);
-
-                Button plus = new Button(this);
-                Button minus = new Button(this);
-                plus.setText("+");
-                minus.setText("-");
-
-                tempStatTextView.setText(statsOrder[j-1] + ": ");
-                tempStatDataTextView.setText(playerOneStatString[i].split(",")[j]);
-
-                plus.setId(100*(i+1) + j);
-                minus.setId(1000*(i+1) + j);
-
-                plus.setOnClickListener(this);
-                minus.setOnClickListener(this);
-
-                row.addView(tempStatTextView);
-                temp_buttons.addView(plus);
-                temp_buttons.addView(tempStatDataTextView);
-                temp_buttons.addView(minus);
-                row.addView(temp_buttons);
-                tempColumnLayout.addView(row);
-            }
-
-            hLayout.addView(tempColumnLayout);
-        }
-        hScrollView.addView(hLayout);
-        stuffLayout.addView(hScrollView);
-
     }
 
 }

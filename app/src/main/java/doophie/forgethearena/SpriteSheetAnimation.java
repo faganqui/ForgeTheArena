@@ -56,13 +56,8 @@ public class SpriteSheetAnimation extends Activity {
 
 
         /*TODO:
-            Make positions for each player
-            Keep track of player bitmaps - rings/amulet/weapons/head/body/costume
             Make animations for each player [attack, idle, ?] [Possibly multiple attack]
-            Write gem and amulet buttons
             add all stat structs
-            Make damage calculations
-            Make healthbar frames?
          */
 
         // This is our thread

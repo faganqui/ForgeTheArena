@@ -15,12 +15,13 @@
     <item name="plus_elemental_force" type="id"/>
     <item name="plus_elemental_resist" type="id"/>
 
-    <item name="minus_durability" type="id"/>
-    <item name="minus_toughness" type="id"/>
-    <item name="minus_power" type="id"/>
-    <item name="minus_speed" type="id"/>
-    <item name="minus_elemental_force" type="id"/>
-    <item name="minus_elemental_resist" type="id"/>
-
-
+    <item name="prev_weapon_switch" type="id"/>
+    <item name="next_weapon_switch" type="id"/>
+    <item name="weapon_view" type="id" />
+    <item name="prev_weapon_switch_1" type="id"/>
+    <item name="next_weapon_switch_1" type="id"/>
+    <item name="weapon_view_1" type="id" />
+    <item name="prev_weapon_switch_2" type="id"/>
+    <item name="next_weapon_switch_2" type="id"/>
+    <item name="weapon_view_2" type="id" />
 </resources>
