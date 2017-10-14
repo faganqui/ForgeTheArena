@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">ForgetheArena</string>
+    <string name="title_activity_sprite_sheet_animation">SpriteSheetAnimation</string>
+    <string name="title_activity_handle_sign_in">HandleSignIn</string>
+    <string name="title_activity_login">LoginActivity</string>
+
+    <string name="auth_failed">authorization failed</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_out">Sign Out</string>
+
+    <string name="user_edit_text">Character Name:</string>
+    <string name="email_edit_text">Email</string>
+    <string name="password_edit_text">Password</string>
+    <string name="title_activity_customize_character">CustomizeCharacterActivity</string>
+
+    <string name="outfit_change_text">Change Outfit</string>
+    <string name="weapon_change_text">Change Weapon</string>
+    <string name="stat_change_text">Change Stats</string>
+    <string name="title_activity_load_from_database">LoadFromDatabase</string>
+</resources>
+

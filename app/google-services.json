@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "297203743697",
+    "firebase_url": "https://forge-the-arena.firebaseio.com",
+    "project_id": "forge-the-arena",
+    "storage_bucket": "forge-the-arena.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:297203743697:android:3d74f1d0b333f381",
+        "android_client_info": {
+          "package_name": "doophie.forgethearena"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "297203743697-vk3vgmu0kurdb1g0am86m78k0qf1jc54.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "doophie.forgethearena",
+            "certificate_hash": "fe4541abecce8a42da5ee5633d5d87dbc35db3cf"
+          }
+        },
+        {
+          "client_id": "297203743697-1gvnfmmj1vfb20rlelvb4ba62qphudrt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRhGhONeqmMTsx-YdwGWIOmggvwFQrbfM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "297203743697-1gvnfmmj1vfb20rlelvb4ba62qphudrt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
