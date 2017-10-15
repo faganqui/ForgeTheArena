@@ -18,5 +18,8 @@
     <string name="weapon_change_text">Change Weapon</string>
     <string name="stat_change_text">Change Stats</string>
     <string name="title_activity_load_from_database">LoadFromDatabase</string>
+
+    <string name="go_to_battle_text">Go To Battle</string>
+    <string name="go_to_customize_screen">Customize Character</string>
 </resources>
 

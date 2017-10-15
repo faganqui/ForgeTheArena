@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
@@ -40,7 +41,7 @@ import java.util.Arrays;
 public class CustomizeCharacterActivity extends AppCompatActivity implements View.OnClickListener{
 
     //useful list
-    private static final String[] statsOrder = {"Durability","Toughness","Power","Speed","Elemental Force","Elemental Resist","Attack Type","Gem Type"};
+    private static final String[] statsOrder = {"Durability","Toughness","Power","Speed","Elemental\nForce","Elemental\nResist","Attack Type","Gem Type"};
 
     //Prefs
     private static final String SHARED_PREFS = "FORGE_SAVED_PREFS";
@@ -214,6 +215,26 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
                 changeWeaponButton(2, false);
                 break;
 
+            //change gem buttons
+            case (R.id.next_gem_switch):
+                changegemButton(0, true);
+                break;
+            case (R.id.next_gem_switch_1):
+                changegemButton(1, true);
+                break;
+            case (R.id.next_gem_switch_2):
+                changegemButton(2, true);
+                break;
+            case (R.id.prev_gem_switch):
+                changegemButton(0, false);
+                break;
+            case (R.id.prev_gem_switch_1):
+                changegemButton(1, false);
+                break;
+            case (R.id.prev_gem_switch_2):
+                changegemButton(2, false);
+                break;
+
             default:
                 //change stat buttons
                 if (view.getId() >= 100 && view.getId() <= 200){
@@ -364,6 +385,35 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         weaponView.setImageBitmap(drawWeapon(weapon_index));
     }
 
+    public void changegemButton(int weapon_index, Boolean isNext){
+        //changes local weapon pieces and displays them
+        //todo: fix all this siht
+        int current_index;
+
+        current_index = Arrays.asList(ownedWeapons).indexOf(playerOneWeaponLocations[weapon_index] + "[" + playerOneStatString[weapon_index]);
+        if(isNext) {
+            current_index = (current_index + 1) % ownedWeapons.length;
+        }else{
+            if(current_index == 0){
+                current_index = ownedWeapons.length-1;
+            }else{
+                current_index--;
+            }
+        }
+        playerOneWeaponLocations[weapon_index] = ownedWeapons[current_index].split("\\[")[0];
+        playerOneStatString[weapon_index] = ownedWeapons[current_index].split("\\[")[1];
+
+        //update all held weapons
+        for(int weapon_held_index = 0; weapon_held_index < 3; weapon_held_index++){
+            if(playerOneWeaponLocations[weapon_held_index].equals(playerOneWeaponLocations[weapon_index])) {
+                playerOneStatString[weapon_held_index] = ownedWeapons[current_index].split("\\[")[1];
+            }
+        }
+
+        ImageView weaponView = findViewById(R.id.weapon_view + weapon_index);
+        weaponView.setImageBitmap(drawWeapon(weapon_index));
+    }
+
     public void changeOutfitButton(int piece, boolean isNext){
         //changes local outfit pieces and displays them
         String[] temp_list;
@@ -484,13 +534,27 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
                 frameHeight,
                 false);
 
-        Bitmap drawnBitmap = Bitmap.createBitmap(600, 600, Bitmap.Config.ARGB_8888);
+        Bitmap drawnBitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(drawnBitmap);
 
         canvas.drawBitmap(weapon, frameToDraw, whereToDraw, null);
 
         return(drawnBitmap);
+    }
+
+    public Bitmap drawGem(int index){
+        //load and scale the gem
+        int resID = getResources().getIdentifier(stringGem[index],
+                "drawable", getPackageName());
+        Bitmap weapon = BitmapFactory.decodeResource(this.getResources(), resID);
+
+        weapon = Bitmap.createScaledBitmap(weapon,
+                200,
+                200,
+                false);
+
+        return(weapon);
     }
 /*end of drawing helper messages*/
 
@@ -538,9 +602,48 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
             prev_button.setOnClickListener(this);
             next_button.setOnClickListener(this);
 
+            LinearLayout gem_layout = new LinearLayout(this);
+            gem_layout.setOrientation(LinearLayout.VERTICAL);
+            gem_layout.setGravity(Gravity.CENTER);
+
+            Button gemNextButton = new Button(this);
+            Button gemPrevButton = new Button(this);
+
+            gemNextButton.setText("/\\");
+            gemNextButton.setText("/\\");
+
+            ImageView gemView = new ImageView(this);
+            gemView.setImageBitmap(drawGem(weapon_index));
+
+            switch (weapon_index){
+                case 0:
+                    gemPrevButton.setId(R.id.prev_gem_switch);
+                    gemNextButton.setId(R.id.next_gem_switch);
+                    gemView.setId(R.id.gem_view);
+                    break;
+                case 1:
+                    gemPrevButton.setId(R.id.prev_gem_switch_1);
+                    gemNextButton.setId(R.id.next_gem_switch_1);
+                    gemView.setId(R.id.gem_view_1);
+                    break;
+                case 2:
+                    gemPrevButton.setId(R.id.prev_gem_switch_2);
+                    gemNextButton.setId(R.id.next_gem_switch_2);
+                    gemView.setId(R.id.gem_view_2);
+                    break;
+            }
+
+            gemNextButton.setOnClickListener(this);
+            gemPrevButton.setOnClickListener(this);
+
+            gem_layout.addView(gemNextButton);
+            gem_layout.addView(gemView);
+            gem_layout.addView(gemPrevButton);
+
             row.addView(prev_button);
             row.addView(weaponView);
             row.addView(next_button);
+            row.addView(gem_layout);
 
             weaponSwitchTable.addView(row);
         }
@@ -553,17 +656,23 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         stuffLayout.removeAllViews();
 
         stuffLayout.setOrientation(LinearLayout.HORIZONTAL);
+        TableLayout.LayoutParams params = new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+        stuffLayout.setLayoutParams(params);
 
-        HorizontalScrollView hScrollView = new HorizontalScrollView(this);
+
         LinearLayout hLayout = new LinearLayout(this);
         hLayout.setOrientation(LinearLayout.HORIZONTAL);
+        params = new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+        hLayout.setLayoutParams(params);
 
         for(int i = 0; i  < 3; i ++){
             TableLayout tempColumnLayout = new TableLayout(this);
+            params = new TableLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+            tempColumnLayout.setLayoutParams(params);
 
             for(int j = 1; j < statsOrder.length; j++){
                 TableRow row = new TableRow(this);
-                TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
+                TableRow.LayoutParams lp = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
                 row.setLayoutParams(lp);
                 row.setGravity(Gravity.CENTER_VERTICAL);
                 //linear layout for the + button and number
@@ -592,8 +701,8 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
                 minus.setOnClickListener(this);
 
                 row.addView(tempStatTextView);
+                row.addView(tempStatDataTextView);
                 temp_buttons.addView(plus);
-                temp_buttons.addView(tempStatDataTextView);
                 temp_buttons.addView(minus);
                 row.addView(temp_buttons);
                 tempColumnLayout.addView(row);
@@ -601,8 +710,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
 
             hLayout.addView(tempColumnLayout);
         }
-        hScrollView.addView(hLayout);
-        stuffLayout.addView(hScrollView);
+        stuffLayout.addView(hLayout);
 
     }
 

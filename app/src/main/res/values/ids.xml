@@ -24,4 +24,14 @@
     <item name="prev_weapon_switch_2" type="id"/>
     <item name="next_weapon_switch_2" type="id"/>
     <item name="weapon_view_2" type="id" />
+
+    <item name="prev_gem_switch" type="id"/>
+    <item name="next_gem_switch" type="id"/>
+    <item name="gem_view" type="id" />
+    <item name="prev_gem_switch_1" type="id"/>
+    <item name="next_gem_switch_1" type="id"/>
+    <item name="gem_view_1" type="id" />
+    <item name="prev_gem_switch_2" type="id"/>
+    <item name="next_gem_switch_2" type="id"/>
+    <item name="gem_view_2" type="id" />
 </resources>

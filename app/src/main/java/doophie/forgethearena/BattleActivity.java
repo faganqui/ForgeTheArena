@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -16,7 +18,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.w3c.dom.Text;
 
-public class BattleActivity extends AppCompatActivity {
+public class BattleActivity extends AppCompatActivity implements View.OnClickListener {
 
     //Prefs
     private static final String SHARED_PREFS = "FORGE_SAVED_PREFS";
@@ -54,13 +56,8 @@ public class BattleActivity extends AppCompatActivity {
     private static final String SECOND_ENEMY_WEAPON_STATS = "enemystats2";
     private static final String THIRD_ENEMY_WEAPON_STATS = "enemystats3";
 
-    EditText temp_player_stats_1;
-    EditText temp_player_stats_2;
-    EditText temp_player_stats_3;
-
-    EditText temp_enemy_stats_1;
-    EditText temp_enemy_stats_2;
-    EditText temp_enemy_stats_3;
+    Button goToCustomize;
+    Button goToBattle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,68 +67,35 @@ public class BattleActivity extends AppCompatActivity {
         Intent recievedIntent = getIntent();
         String result = recievedIntent.getStringExtra("result");
 
-        if(result != null){
+        if (result != null) {
             TextView helloworld = (TextView) findViewById(R.id.helloworld);
             helloworld.setText(result);
         }
 
-        temp_player_stats_1 = new EditText(this);
-        temp_player_stats_2 = new EditText(this);
-        temp_player_stats_3 = new EditText(this);
+        goToBattle = findViewById(R.id.go_to_battle);
+        goToCustomize = findViewById(R.id.go_to_customize);
 
-        temp_enemy_stats_1 = new EditText(this);
-        temp_enemy_stats_2 = new EditText(this);
-        temp_enemy_stats_3 = new EditText(this);
+        goToBattle.setOnClickListener(this);
+        goToCustomize.setOnClickListener(this);
 
-        temp_player_stats_1.setText("0,10,15,15,20,15,15,Pi-Ea,Ea");
-        temp_player_stats_2.setText("0,10,15,15,20,15,15,Pi-Ea,Ea");
-        temp_player_stats_3.setText("0,10,15,15,20,15,15,Pi-Ea,Ea");
-
-        temp_enemy_stats_1.setText("0,10,15,15,20,15,15,Pi-Ea,Ea");
-        temp_enemy_stats_2.setText("0,10,15,15,20,15,15,Pi-Ea,Ea");
-        temp_enemy_stats_3.setText("0,10,15,15,20,15,15,Pi-Ea,Ea");
-
-        LinearLayout thisView = (LinearLayout) findViewById(R.id.battle_view);
-        thisView.addView(temp_player_stats_1);
-        thisView.addView(temp_player_stats_2);
-        thisView.addView(temp_player_stats_3);
-
-        thisView.addView(temp_enemy_stats_1);
-        thisView.addView(temp_enemy_stats_2);
-        thisView.addView(temp_enemy_stats_3);
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent motionEvent) {
-
-        float ypos = motionEvent.getX();
-
-        switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
-
-            // Player has touched the screen
-            case MotionEvent.ACTION_DOWN:
-
+    public void onClick(View view){
+        Intent intent;
+        switch(view.getId()){
+            case R.id.go_to_battle:
+                makeNewEnemy();
+                intent = new Intent(this, SpriteSheetAnimation.class);
+                startActivity(intent);
                 break;
-
-            // Player has removed finger from screen
-            case MotionEvent.ACTION_UP:
-                if(ypos > 750) {
-                    setSavedPrefs();
-
-                    Intent intent = new Intent(this, CustomizeCharacterActivity.class);
-                    startActivity(intent);
-                    break;
-                }else{
-
-                    setSavedPrefs();
-
-                    Intent intent = new Intent(this, SpriteSheetAnimation.class);
-                    startActivity(intent);
-                }
+            case R.id.go_to_customize:
+                intent = new Intent(this, CustomizeCharacterActivity.class);
+                startActivity(intent);
+                break;
         }
-        return true;
-    }
 
+    }
     @Override
     public void onBackPressed(){
         FirebaseAuth.getInstance().signOut();
@@ -139,25 +103,77 @@ public class BattleActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void setSavedPrefs(){
+    public void makeNewEnemy(){
         SharedPreferences sharedPref = this.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-
-        //todo: set these in different places
         editor.putString(STRING_BACKGROUND, "background");
 
-        editor.putString(FIRST_ENEMY_WEAPON, "sword");
-        editor.putString(SECOND_ENEMY_WEAPON, "axe");
-        editor.putString(THIRD_ENEMY_WEAPON, "mace");
+        String[] weapons = {"sword","axe","mace"};
+        editor.putString(FIRST_ENEMY_WEAPON, weapons[(randomWithRange(0,2))]);
+        editor.putString(SECOND_ENEMY_WEAPON, weapons[(randomWithRange(0,2))]);
+        editor.putString(THIRD_ENEMY_WEAPON, weapons[(randomWithRange(0,2))]);
 
-        editor.putString(ENEMY_HEAD, "bob");
-        editor.putString(ENEMY_LEGS, "bob");
-        editor.putString(ENEMY_TORSO, "bob");
+        String[] heads = {"head","head2","head3"};
+        editor.putString(ENEMY_HEAD, heads[(randomWithRange(0,2))]);
+        editor.putString(ENEMY_LEGS, "legs");
+        editor.putString(ENEMY_TORSO, "body2");
 
-        editor.putString(FIRST_ENEMY_WEAPON_STATS, String.valueOf(temp_enemy_stats_1.getText()));
-        editor.putString(SECOND_ENEMY_WEAPON_STATS, String.valueOf(temp_enemy_stats_2.getText()));
-        editor.putString(THIRD_ENEMY_WEAPON_STATS, String.valueOf(temp_enemy_stats_3.getText()));
-
+        editor.putString(FIRST_ENEMY_WEAPON_STATS, getRandomStatString());
+        editor.putString(SECOND_ENEMY_WEAPON_STATS, getRandomStatString());
+        editor.putString(THIRD_ENEMY_WEAPON_STATS, getRandomStatString());
         editor.commit();
     }
+
+    public String getRandomStatString(){
+
+        String element_type = "";
+        switch (randomWithRange(0,4)) {
+            case 0:
+                element_type = "Wa";
+                break;
+            case 1:
+                element_type = "Fi";
+                break;
+            case 2:
+                element_type = "Ea";
+                break;
+            case 3:
+                element_type = "Da";
+                break;
+            case 4:
+                element_type = "Li";
+                break;
+        }
+
+        String attack_type = "";
+        switch (randomWithRange(0,2)){
+            case 0:
+                attack_type = "Cr";
+                break;
+            case 1:
+                attack_type = "Sl";
+                break;
+            case 2:
+                attack_type = "Pi";
+                break;
+        }
+
+        return String.valueOf("0," + //cur health always 0
+                (randomWithRange(10,20)) +","+ //durability
+                (randomWithRange(10,40)) +","+ //toughness
+                (randomWithRange(10,40)) +","+ //power
+                (randomWithRange(10,40)) +","+ //speed
+                (randomWithRange(10,40)) +","+ //elemental force
+                (randomWithRange(10,40)) +","+ //elemental resistance
+                attack_type + "-" + element_type +
+                "," + element_type);
+
+    }
+
+    int randomWithRange(int min, int max)
+    {
+        int range = Math.abs(max - min) + 1;
+        return (int)(Math.random() * range) + (min <= max ? min : max);
+    }
 }
+
