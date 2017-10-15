@@ -246,7 +246,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         for (String weapon: ownedWeapons){
             weapons += weapon + "]";
         }
-        weapons = weapons.substring(0,weapons.length()-2);
+        weapons = weapons.substring(0,weapons.length()-1);
 
         String[] values = {String.valueOf(displayNameInput.getText()),
                 playerOneWeaponLocations[0],playerOneWeaponLocations[1],playerOneWeaponLocations[2],
@@ -355,7 +355,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
 
         //update all held weapons
         for(int weapon_held_index = 0; weapon_held_index < 3; weapon_held_index++){
-            if(playerOneWeaponLocations[weapon_held_index] == playerOneWeaponLocations[weapon_index]) {
+            if(playerOneWeaponLocations[weapon_held_index].equals(playerOneWeaponLocations[weapon_index])) {
                 playerOneStatString[weapon_held_index] = ownedWeapons[current_index].split("\\[")[1];
             }
         }
@@ -407,8 +407,8 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
 
         //update all held weapons
         for(int weapon_held_index = 0; weapon_held_index < 3; weapon_held_index++){
-            if(playerOneWeaponLocations[weapon_held_index] == playerOneWeaponLocations[weapon]) {
-                playerOneStatString[weapon_held_index] = stats_string;
+            if(playerOneWeaponLocations[weapon_held_index].equals(playerOneWeaponLocations[weapon])) {
+                playerOneStatString[weapon_held_index] = ownedWeapons[index_of_weapon].split("\\[")[1];
             }
         }
 
