@@ -78,6 +78,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
     //unlocked items
     String[] ownedWeapons;
     String[] ownedOutfits;
+    String[] gems = {"gemearth","gemfire","gemwater","gemlight","gemdark"};
 
     //User stats
     String userId;
@@ -371,6 +372,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
                 current_index--;
             }
         }
+
         playerOneWeaponLocations[weapon_index] = ownedWeapons[current_index].split("\\[")[0];
         playerOneStatString[weapon_index] = ownedWeapons[current_index].split("\\[")[1];
 
@@ -386,32 +388,61 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
     }
 
     public void changegemButton(int weapon_index, Boolean isNext){
-        //changes local weapon pieces and displays them
+        //changes local weapon gem pieces and displays them
         //todo: fix all this siht
         int current_index;
 
+        // gets the index of the weapon in "owned weapons" as well as "held weapon"
+        // todo: chane playerOneWeaponLocations to hold  the index of it in owned weapons instead
         current_index = Arrays.asList(ownedWeapons).indexOf(playerOneWeaponLocations[weapon_index] + "[" + playerOneStatString[weapon_index]);
-        if(isNext) {
-            current_index = (current_index + 1) % ownedWeapons.length;
-        }else{
-            if(current_index == 0){
-                current_index = ownedWeapons.length-1;
-            }else{
-                current_index--;
-            }
-        }
-        playerOneWeaponLocations[weapon_index] = ownedWeapons[current_index].split("\\[")[0];
-        playerOneStatString[weapon_index] = ownedWeapons[current_index].split("\\[")[1];
 
-        //update all held weapons
+        int type;
+
+        //figure out what the old gem type was and change it
+        //todo: maybe make this better also use isNext
+        if(ownedWeapons[current_index].contains("Ea")) {
+            ownedWeapons[current_index] = ownedWeapons[current_index].replace("Ea", "Fi");
+            type = 1;
+        }else if(ownedWeapons[current_index].contains("Fi")) {
+            ownedWeapons[current_index] = ownedWeapons[current_index].replace("Fi", "Wa");
+            type = 2;
+        }else if(ownedWeapons[current_index].contains("Wa")) {
+            ownedWeapons[current_index] = ownedWeapons[current_index].replace("Wa", "Li");
+            type = 3;
+        }else if(ownedWeapons[current_index].contains("Li")){
+            ownedWeapons[current_index] = ownedWeapons[current_index].replace("Li", "Da");
+            type = 4;
+        } else {
+            ownedWeapons[current_index] = ownedWeapons[current_index].replace("Da", "Ea");
+            type = 0;
+        }
+
+        //update all held weapon gems
+        ImageView gemView = new ImageView(this);
         for(int weapon_held_index = 0; weapon_held_index < 3; weapon_held_index++){
+            // since we can hold multiple copies of the same weapon we have to update them all
             if(playerOneWeaponLocations[weapon_held_index].equals(playerOneWeaponLocations[weapon_index])) {
+                //update stat arrays of held weapons containing the changed gem
                 playerOneStatString[weapon_held_index] = ownedWeapons[current_index].split("\\[")[1];
+
+                //update string of gem picture
+                stringGem[weapon_held_index] = gems[type];
+
+                //draw the new gem(s)
+                switch (weapon_held_index){
+                    case 0:
+                        gemView = findViewById(R.id.gem_view);
+                        break;
+                    case 1:
+                        gemView = findViewById(R.id.gem_view_1);
+                        break;
+                    case 2:
+                        gemView = findViewById(R.id.gem_view_2);
+                        break;
+                }
+                gemView.setImageBitmap(drawGem(weapon_held_index));
             }
         }
-
-        ImageView weaponView = findViewById(R.id.weapon_view + weapon_index);
-        weaponView.setImageBitmap(drawWeapon(weapon_index));
     }
 
     public void changeOutfitButton(int piece, boolean isNext){
@@ -548,6 +579,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         int resID = getResources().getIdentifier(stringGem[index],
                 "drawable", getPackageName());
         Bitmap weapon = BitmapFactory.decodeResource(this.getResources(), resID);
+
 
         weapon = Bitmap.createScaledBitmap(weapon,
                 200,
