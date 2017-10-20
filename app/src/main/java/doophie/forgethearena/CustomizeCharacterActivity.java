@@ -72,7 +72,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
 
     private static final String TAG = "CustCharAct";
 
-    //get database objects
+    //datatbase
     FirebaseDatabase database;
 
     //unlocked items
@@ -375,6 +375,30 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
 
         playerOneWeaponLocations[weapon_index] = ownedWeapons[current_index].split("\\[")[0];
         playerOneStatString[weapon_index] = ownedWeapons[current_index].split("\\[")[1];
+
+        if (ownedWeapons[current_index].split("\\[")[1].contains("Wa")){
+            stringGem[weapon_index] = gems[2];
+        } else if (ownedWeapons[current_index].split("\\[")[1].contains("Li")){
+            stringGem[weapon_index] = gems[3];
+        } else if (ownedWeapons[current_index].split("\\[")[1].contains("Da")){
+            stringGem[weapon_index] = gems[4];
+        } else if (ownedWeapons[current_index].split("\\[")[1].contains("Ea")){
+            stringGem[weapon_index] = gems[0];
+        } else if (ownedWeapons[current_index].split("\\[")[1].contains("Fi")){
+            stringGem[weapon_index] = gems[1];
+        }
+
+        //draw gem of newly selected weapon
+        ImageView gemImage = findViewById(R.id.gem_view);
+        switch (weapon_index){
+            case 1:
+                gemImage = findViewById(R.id.gem_view_1);
+                break;
+            case 2:
+                gemImage = findViewById(R.id.gem_view_2);
+                break;
+        }
+        gemImage.setImageBitmap(drawGem(weapon_index));
 
         //update all held weapons
         for(int weapon_held_index = 0; weapon_held_index < 3; weapon_held_index++){

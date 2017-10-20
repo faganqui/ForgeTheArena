@@ -25,6 +25,13 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 public class SpriteSheetAnimation extends Activity {
 
     // Our object that will hold the view and
@@ -116,6 +123,10 @@ public class SpriteSheetAnimation extends Activity {
         // This variable tracks the game frame rate
         long fps;
 
+        //get database objects
+        FirebaseDatabase database;
+        String userId;
+
         // This is used to help calculate the fps
         private long timeThisFrame;
 
@@ -137,6 +148,11 @@ public class SpriteSheetAnimation extends Activity {
         //gem colours
         Color[] playerGems;
         Color[] enemyGems;
+
+        //other stuff
+        String playerOneName = "";
+        String playerTwoString = "";
+        String money;
 
         // Bitmaps for enemy - we load this first, because chivalry
         String[] stringPlayerTwo = new String[3];
@@ -256,6 +272,9 @@ public class SpriteSheetAnimation extends Activity {
             // SurfaceView class to set up our object.
             // How kind.
             super(context);
+
+            userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            database = FirebaseDatabase.getInstance();
 
             //get size of screen to set up interface
             Point size = new Point();
@@ -436,10 +455,19 @@ public class SpriteSheetAnimation extends Activity {
             }else{
                 //won wooo
                 //todo: write this
+                setStat("moneymoneymoney", String.valueOf(Integer.valueOf(money) + 75));
+
                 Intent intent = new Intent(getContext(), BattleActivity.class);
                 intent.putExtra("result", "won");
                 startActivity(intent);
             }
+        }
+
+        public void setStat(String stat, String value){
+            // sets a specific statistic for a user in the database
+            DatabaseReference statData = database.getReference("/users/" + userId + "/" + stat);
+            statData.setValue(value);
+
         }
 
         // Everything that needs to be updated goes in here
@@ -825,6 +853,8 @@ public class SpriteSheetAnimation extends Activity {
             SharedPreferences sharedPref = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
             stringBackground = sharedPref.getString(STRING_BACKGROUND, "background");
+
+            money = sharedPref.getString("moneymoneymoney", "0");
 
             playerOneWeaponLocations[0] = sharedPref.getString(FIRST_WEAPON, "sword");
             playerOneWeaponLocations[1] = sharedPref.getString(SECOND_WEAPON, "sword");

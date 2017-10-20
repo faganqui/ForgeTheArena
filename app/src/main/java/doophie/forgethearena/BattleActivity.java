@@ -109,22 +109,27 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
         editor.putString(STRING_BACKGROUND, "background");
 
         String[] weapons = {"sword","axe","mace"};
-        editor.putString(FIRST_ENEMY_WEAPON, weapons[(randomWithRange(0,2))]);
-        editor.putString(SECOND_ENEMY_WEAPON, weapons[(randomWithRange(0,2))]);
-        editor.putString(THIRD_ENEMY_WEAPON, weapons[(randomWithRange(0,2))]);
+
+        String w1 = weapons[(randomWithRange(0,2))];
+        String w2 = weapons[(randomWithRange(0,2))];
+        String w3 = weapons[(randomWithRange(0,2))];
+
+        editor.putString(FIRST_ENEMY_WEAPON, w1);
+        editor.putString(SECOND_ENEMY_WEAPON, w2);
+        editor.putString(THIRD_ENEMY_WEAPON, w3);
 
         String[] heads = {"head","head2","head3"};
         editor.putString(ENEMY_HEAD, heads[(randomWithRange(0,2))]);
         editor.putString(ENEMY_LEGS, "legs");
         editor.putString(ENEMY_TORSO, "body2");
 
-        editor.putString(FIRST_ENEMY_WEAPON_STATS, getRandomStatString());
-        editor.putString(SECOND_ENEMY_WEAPON_STATS, getRandomStatString());
-        editor.putString(THIRD_ENEMY_WEAPON_STATS, getRandomStatString());
+        editor.putString(FIRST_ENEMY_WEAPON_STATS, getRandomStatString(w1));
+        editor.putString(SECOND_ENEMY_WEAPON_STATS, getRandomStatString(w2));
+        editor.putString(THIRD_ENEMY_WEAPON_STATS, getRandomStatString(w3));
         editor.commit();
     }
 
-    public String getRandomStatString(){
+    public String getRandomStatString(String weapon){
 
         String element_type = "";
         switch (randomWithRange(0,4)) {
@@ -146,25 +151,25 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         String attack_type = "";
-        switch (randomWithRange(0,2)){
-            case 0:
+        switch (weapon){
+            case "mace":
                 attack_type = "Cr";
                 break;
-            case 1:
+            case "axe":
                 attack_type = "Sl";
                 break;
-            case 2:
+            case "sword":
                 attack_type = "Pi";
                 break;
         }
 
         return String.valueOf("0," + //cur health always 0
-                (randomWithRange(10,20)) +","+ //durability
-                (randomWithRange(10,40)) +","+ //toughness
-                (randomWithRange(10,40)) +","+ //power
-                (randomWithRange(10,40)) +","+ //speed
-                (randomWithRange(10,40)) +","+ //elemental force
-                (randomWithRange(10,40)) +","+ //elemental resistance
+                (randomWithRange(20,40)) +","+ //durability
+                (randomWithRange(20,60)) +","+ //toughness
+                (randomWithRange(20,60)) +","+ //power
+                (randomWithRange(20,60)) +","+ //speed
+                (randomWithRange(20,60)) +","+ //elemental force
+                (randomWithRange(20,60)) +","+ //elemental resistance
                 attack_type + "-" + element_type +
                 "," + element_type);
 
