@@ -35,13 +35,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
+import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class CustomizeCharacterActivity extends AppCompatActivity implements View.OnClickListener{
 
     //useful list
-    private static final String[] statsOrder = {"Durability","Toughness","Power","Speed","Elemental\nForce","Elemental\nResist","Attack Type","Gem Type"};
+    private static final String[] statsOrder = {"Durability","Toughness","Power","Speed","Elemental\nForce","Elemental\nResist","Attack Type"};
 
     //Prefs
     private static final String SHARED_PREFS = "FORGE_SAVED_PREFS";
@@ -55,6 +56,10 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
     private static final String PLAYER_LEGS = "playerlegs";
     private static final String PLAYER_TORSO = "playertorso";
     private static final String PLAYER_HEAD = "playerhead";
+
+    private static final String WEAPON_ONE_SPENT_STATS = "weapononespentstats";
+    private static final String WEAPON_TWO_SPENT_STATS = "weapontwospentstats";
+    private static final String WEAPON_THREE_SPENT_STATS = "weaponthreespentstats";
 
     private static final String OWNED_OUTFITS = "ownedoutfits";
 
@@ -86,11 +91,13 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
     String[] playerOneStatString = new String[3];
     String[] playerOneWeaponLocations = new String[3];
     String[] stringPlayerOne = new String[3];
+    String[] stringPlayerOneSpent = new String[3];
+    int availible_points = 0;
     String[] stringGem = new String[3];
     String stringAmulet;
 
     //locations of items for ease of saving
-    String[] stat_array = new String[15];
+    String[] stat_array = new String[18];
     int save_index = 0;
 
     //interface objects
@@ -137,7 +144,10 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         stat_array[11] = FIRST_WEAPON_STATS;
         stat_array[12] = SECOND_WEAPON_STATS;
         stat_array[13] = THIRD_WEAPON_STATS;
-        stat_array[14] = OWNED_WEAPONS;
+        stat_array[14] = WEAPON_ONE_SPENT_STATS;
+        stat_array[15] = WEAPON_TWO_SPENT_STATS;
+        stat_array[16] = WEAPON_THREE_SPENT_STATS;
+        stat_array[17] = OWNED_WEAPONS;
 
         //load interface objects
         displayNameInput = findViewById(R.id.DisplayEditText);
@@ -236,17 +246,24 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
                 changegemButton(2, false);
                 break;
 
+            case (R.id.reset_button):
+                statResetButtons();
+                break;
+
             default:
                 //change stat buttons
                 if (view.getId() >= 100 && view.getId() <= 200){
                     //first weapon plus
-                    setWeaponStat(0,view.getId()-100,true);
+                    //setWeaponStat(0,view.getId()-100,increaseWeaponStat(0, view.getId()-100);true);
+                    increaseWeaponStat(0, view.getId()-100);
                 } else if (view.getId() >= 200 && view.getId() <= 300){
                     //second weapon plus
-                    setWeaponStat(1,view.getId()-200,true);
+                    //setWeaponStat(1,view.getId()-200,true);
+                    increaseWeaponStat(1, view.getId()-200);
                 } else if (view.getId() >= 300 && view.getId() <= 400){
                     //third weapon plus
-                    setWeaponStat(2,view.getId()-300,true);
+                    //setWeaponStat(2,view.getId()-300,true);
+                    increaseWeaponStat(2, view.getId()-300);
                 } else if (view.getId() >= 1000 && view.getId() <= 1100){
                     //first weapon minus
                     setWeaponStat(0,view.getId()-1000,false);
@@ -276,6 +293,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
                 stringGem[0],stringGem[1],stringGem[2],
                 stringAmulet,
                 playerOneStatString[0],playerOneStatString[1],playerOneStatString[2],
+                stringPlayerOneSpent[0],stringPlayerOneSpent[1],stringPlayerOneSpent[2],
                 weapons
         };
 
@@ -321,6 +339,10 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         stringPlayerOne[1] = sharedPref.getString(PLAYER_TORSO, "sword");
         stringPlayerOne[2] = sharedPref.getString(PLAYER_HEAD, "sword");
 
+        stringPlayerOneSpent[0] = sharedPref.getString(WEAPON_ONE_SPENT_STATS, "0,0,0,0,0,0,0");
+        stringPlayerOneSpent[1] = sharedPref.getString(WEAPON_TWO_SPENT_STATS, "0,0,0,0,0,0,0");
+        stringPlayerOneSpent[2] = sharedPref.getString(WEAPON_THREE_SPENT_STATS, "0,0,0,0,0,0,0");
+
         //get the owned weapons & outfits for each player
         ownedOutfits = sharedPref.getString(OWNED_OUTFITS, "").split("]");
         ownedWeapons = sharedPref.getString(OWNED_WEAPONS, "").split("]");
@@ -335,9 +357,32 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         playerOneStatString[0] = sharedPref.getString(FIRST_WEAPON_STATS, "sword");
         playerOneStatString[1] = sharedPref.getString(SECOND_WEAPON_STATS, "sword");
         playerOneStatString[2] = sharedPref.getString(THIRD_WEAPON_STATS, "sword");
+
+        //see how many spent points have been spent
+        availible_points = 75;
+        for (int i = 0 ; i < 3; i++){
+            for (int j = 0; j < stringPlayerOneSpent[i].split(",").length; j ++){
+                availible_points -= Integer.valueOf(stringPlayerOneSpent[i].split(",")[j]);
+            }
+        }
     }
 
     /*helper function to set statistics*/
+    public String addStatStrings(String stat_string_one, String stat_string_two){
+        // adds all the integers in stat string one and stat string two which are seperated by commas
+        // they are each expected to contain 7 ints
+
+        String new_stat_string = "";
+
+        String[] stat_array1 = stat_string_one.split(",");
+        String[] stat_array2 = stat_string_two.split(",");
+
+        for (int i = 0 ; i < 7; i ++){
+            new_stat_string += String.valueOf(Integer.valueOf(stat_array1[i]) + Integer.valueOf(stat_array2[i])) + ",";
+        }
+
+        return new_stat_string;
+    }
 
     public void setStat(String stat, String value){
         // sets a specific statistic for a user in the database
@@ -361,6 +406,14 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
     public void changeWeaponButton(int weapon_index, Boolean isNext){
         //changes local weapon pieces and displays them
         int current_index;
+
+        //refund points spent on selected weapon
+        int spent_points = 0;
+        for (String stat : stringPlayerOneSpent[weapon_index].split(",")){
+            spent_points += Integer.valueOf(stat);
+        }
+        stringPlayerOneSpent[weapon_index] = "0,0,0,0,0,0,0";
+        availible_points += spent_points;
 
         current_index = Arrays.asList(ownedWeapons).indexOf(playerOneWeaponLocations[weapon_index] + "[" + playerOneStatString[weapon_index]);
         if(isNext) {
@@ -489,6 +542,25 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         drawCharacter();
     }
 
+    public void increaseWeaponStat(int weapon, int stat){
+        if (availible_points > 0) {
+            String[] cur_stats = stringPlayerOneSpent[weapon].split(",");
+            int cur_stat = Integer.valueOf(cur_stats[stat]);
+
+            cur_stat++;
+            availible_points--;
+
+            cur_stats[stat] = String.valueOf(cur_stat);
+
+            String stats_string = "";
+            for(String temp_stat : cur_stats){
+                stats_string += (temp_stat + ",");
+            }
+
+            stringPlayerOneSpent[weapon] = stats_string;
+        }
+        setStatInterface();
+    }
 
     public void setWeaponStat(int weapon, int stat, Boolean isPlus){
         //set the stat of a specific weapon locally - will be saved to database on activity exit
@@ -519,9 +591,17 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
 
         setStatInterface();
     }
+
+    public void statResetButtons(){
+        stringPlayerOneSpent[0] = "0,0,0,0,0,0,0";
+        stringPlayerOneSpent[1] = "0,0,0,0,0,0,0";
+        stringPlayerOneSpent[2] = "0,0,0,0,0,0,0";
+        availible_points = 75;
+        setStatInterface();
+    }
     /*end of methods to set statistics
 
-/* helper methods for drawing bitmaps or other character */
+    /* helper methods for drawing bitmaps or other character */
     public String getEmojiByUnicode(int unicode){
         return new String(Character.toChars(unicode));
     }
@@ -612,13 +692,14 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
 
         return(weapon);
     }
-/*end of drawing helper messages*/
+    /*end of drawing helper messages*/
 
     public void onBackPressed(){
         Intent intent = new Intent(this, LoadFromDatabase.class);
         startActivity(intent);
     }
 
+    /*draw interfaces*/
     public void setWeaponInterface(){
         //allows user to change weapon
         stuffLayout.removeAllViews();
@@ -711,22 +792,39 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         //allows user to change stats
         stuffLayout.removeAllViews();
 
-        stuffLayout.setOrientation(LinearLayout.HORIZONTAL);
+        stuffLayout.setOrientation(LinearLayout.VERTICAL);
         TableLayout.LayoutParams params = new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
         stuffLayout.setLayoutParams(params);
-
 
         LinearLayout hLayout = new LinearLayout(this);
         hLayout.setOrientation(LinearLayout.HORIZONTAL);
         params = new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
         hLayout.setLayoutParams(params);
 
+        Button resetButton = new Button(this);
+        resetButton.setId(R.id.reset_button);
+        resetButton.setText("Reset");
+        resetButton.setOnClickListener(this);
+
+        TextView availPoints = new TextView(this);
+        availPoints.setText("Availible Points: " + availible_points);
+
+        stuffLayout.addView(availPoints);
+        stuffLayout.addView(resetButton);
+
+        String[] new_stat_strings = new String[3];
+
         for(int i = 0; i  < 3; i ++){
+            //for each column
             TableLayout tempColumnLayout = new TableLayout(this);
             params = new TableLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
             tempColumnLayout.setLayoutParams(params);
 
+            //get new stat value by adding the spent points and the base weapon stats
+            new_stat_strings[i] = addStatStrings(playerOneStatString[i], stringPlayerOneSpent[i]);
+
             for(int j = 1; j < statsOrder.length; j++){
+                //for each row
                 TableRow row = new TableRow(this);
                 TableRow.LayoutParams lp = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
                 row.setLayoutParams(lp);
@@ -748,7 +846,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
                 minus.setText("-");
 
                 tempStatTextView.setText(statsOrder[j-1] + ": ");
-                tempStatDataTextView.setText(playerOneStatString[i].split(",")[j]);
+                tempStatDataTextView.setText(new_stat_strings[i].split(",")[j]);
 
                 plus.setId(100*(i+1) + j);
                 minus.setId(1000*(i+1) + j);
@@ -759,7 +857,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
                 row.addView(tempStatTextView);
                 row.addView(tempStatDataTextView);
                 temp_buttons.addView(plus);
-                temp_buttons.addView(minus);
+                //temp_buttons.addView(minus);
                 row.addView(temp_buttons);
                 tempColumnLayout.addView(row);
             }
@@ -830,5 +928,6 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         stuffLayout.addView(imageView);
         stuffLayout.addView(change_next_col);
     }
+    /*end interfaces*/
 
 }

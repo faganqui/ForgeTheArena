@@ -21,7 +21,7 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="ForgeDefaultTheme" parent="AppTheme" >
+    <style name="ForgeDefaultTheme" parent="AppTheme">
         <item name="android:colorBackground">@color/background_material_light</item>
     </style>
 

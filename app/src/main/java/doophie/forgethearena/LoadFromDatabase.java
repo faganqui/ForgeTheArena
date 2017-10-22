@@ -43,6 +43,11 @@ public class LoadFromDatabase extends AppCompatActivity {
     private static final String THIRD_GEM = "gem3";
     private static final String AMULET_STRING = "amulet";
 
+    private static final String WEAPON_ONE_SPENT_STATS = "weapononespentstats";
+    private static final String WEAPON_TWO_SPENT_STATS = "weapontwospentstats";
+    private static final String WEAPON_THREE_SPENT_STATS = "weaponthreespentstats";
+
+
     private static final String FIRST_WEAPON_STATS = "stats1";
     private static final String SECOND_WEAPON_STATS = "stats2";
     private static final String THIRD_WEAPON_STATS = "stats3";
@@ -50,7 +55,7 @@ public class LoadFromDatabase extends AppCompatActivity {
     private static final String OWNED_WEAPONS = "ownedweapons";
     private static final String AVAILIBLE_CURRENCY = "moneymoneymoney";
 
-    String[] stat_array = new String[17];
+    String[] stat_array = new String[20];
 
     //get database objects
     FirebaseDatabase database;
@@ -98,9 +103,12 @@ public class LoadFromDatabase extends AppCompatActivity {
         stat_array[11] = FIRST_WEAPON_STATS;
         stat_array[12] = SECOND_WEAPON_STATS;
         stat_array[13] = THIRD_WEAPON_STATS;
-        stat_array[14] = OWNED_WEAPONS;
-        stat_array[15] = AVAILIBLE_CURRENCY;
-        stat_array[16] = OWNED_OUTFITS;
+        stat_array[14] = WEAPON_ONE_SPENT_STATS;
+        stat_array[15] = WEAPON_TWO_SPENT_STATS;
+        stat_array[16] = WEAPON_THREE_SPENT_STATS;
+        stat_array[17] = OWNED_WEAPONS;
+        stat_array[18] = AVAILIBLE_CURRENCY;
+        stat_array[19] = OWNED_OUTFITS;
 
         collectAllData();
 

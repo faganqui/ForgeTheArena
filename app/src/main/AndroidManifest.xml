@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".BattleActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SpriteSheetAnimation"
             android:label="@string/title_activity_sprite_sheet_animation"
@@ -47,6 +47,10 @@
         <activity
             android:name=".LoadFromDatabase"
             android:label="@string/title_activity_load_from_database"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ReforgeWeaponActivity"
+            android:label="@string/title_activity_reforge_weapon"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

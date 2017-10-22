@@ -30,6 +30,10 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
     private static final String SECOND_WEAPON = "weapon2";
     private static final String THIRD_WEAPON = "weapon3";
 
+    private static final String WEAPON_ONE_SPENT_STATS = "weapononespentstats";
+    private static final String WEAPON_TWO_SPENT_STATS = "weapontwospentstats";
+    private static final String WEAPON_THREE_SPENT_STATS = "weaponthreespentstats";
+
     private static final String FIRST_ENEMY_WEAPON = "enemyweapon1";
     private static final String SECOND_ENEMY_WEAPON = "enemyweapon2";
     private static final String THIRD_ENEMY_WEAPON = "enemyweapon3";
@@ -85,8 +89,20 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
         Intent intent;
         switch(view.getId()){
             case R.id.go_to_battle:
-                makeNewEnemy();
                 intent = new Intent(this, SpriteSheetAnimation.class);
+
+                SharedPreferences sharedPref = this.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+
+                //make player one stats
+                editor.putString(FIRST_WEAPON_STATS, addStatStrings(sharedPref.getString(FIRST_WEAPON_STATS, ""), sharedPref.getString(WEAPON_ONE_SPENT_STATS, "0,0,0,0,0,0,0")));
+                editor.putString(SECOND_WEAPON_STATS, addStatStrings(sharedPref.getString(SECOND_WEAPON_STATS, ""), sharedPref.getString(WEAPON_TWO_SPENT_STATS, "0,0,0,0,0,0,0")));
+                editor.putString(THIRD_WEAPON_STATS, addStatStrings(sharedPref.getString(THIRD_WEAPON_STATS, ""), sharedPref.getString(WEAPON_THREE_SPENT_STATS, "0,0,0,0,0,0,0")));
+
+                //make new enimy and commit editor
+                makeNewEnemy(editor);
+
+                //start the battle
                 startActivity(intent);
                 break;
             case R.id.go_to_customize:
@@ -96,6 +112,26 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
         }
 
     }
+
+    public String addStatStrings(String stat_string_one, String stat_string_two){
+        // adds all the integers in stat string one and stat string two which are seperated by commas
+        // they are each expected to contain 7 ints
+
+        String new_stat_string = "";
+
+        String[] stat_array1 = stat_string_one.split(",");
+        String[] stat_array2 = stat_string_two.split(",");
+
+        for (int i = 0 ; i < 7; i ++){
+            new_stat_string += String.valueOf(Integer.valueOf(stat_array1[i]) + Integer.valueOf(stat_array2[i])) + ",";
+        }
+
+        //also add stats of the weapon types to the end for battle only
+        new_stat_string += stat_array1[7] + "," + stat_array1[8];
+
+        return new_stat_string;
+    }
+
     @Override
     public void onBackPressed(){
         FirebaseAuth.getInstance().signOut();
@@ -103,9 +139,7 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
         startActivity(intent);
     }
 
-    public void makeNewEnemy(){
-        SharedPreferences sharedPref = this.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
+    public void makeNewEnemy(SharedPreferences.Editor editor){
         editor.putString(STRING_BACKGROUND, "background");
 
         String[] weapons = {"sword","axe","mace"};

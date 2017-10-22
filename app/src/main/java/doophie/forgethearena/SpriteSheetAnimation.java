@@ -448,7 +448,7 @@ public class SpriteSheetAnimation extends Activity {
             //ends the game based on if we won or not
             if (hasWon == false){
                 //lost :(
-                Intent intent = new Intent(getContext(), BattleActivity.class);
+                Intent intent = new Intent(getContext(), LoadFromDatabase.class);
                 intent.putExtra("result", "loss");
                 startActivity(intent);
 
@@ -457,7 +457,7 @@ public class SpriteSheetAnimation extends Activity {
                 //todo: write this
                 setStat("moneymoneymoney", String.valueOf(Integer.valueOf(money) + 75));
 
-                Intent intent = new Intent(getContext(), BattleActivity.class);
+                Intent intent = new Intent(getContext(), LoadFromDatabase.class);
                 intent.putExtra("result", "won");
                 startActivity(intent);
             }
@@ -1204,6 +1204,14 @@ public class SpriteSheetAnimation extends Activity {
 
     }
     // This is the end of our GameView inner class
+
+
+    @Override
+    public void onBackPressed(){
+        Intent intent = new Intent(this, LoadFromDatabase.class);
+        intent.putExtra("result", "loss");
+        startActivity(intent);
+    }
 
     // This method executes when the player starts the game
     @Override

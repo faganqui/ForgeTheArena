@@ -21,5 +21,6 @@
 
     <string name="go_to_battle_text">Go To Battle</string>
     <string name="go_to_customize_screen">Customize Character</string>
+    <string name="title_activity_reforge_weapon">ReforgeWeaponActivity</string>
 </resources>
 
