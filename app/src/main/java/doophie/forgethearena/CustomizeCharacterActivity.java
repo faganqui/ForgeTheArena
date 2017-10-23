@@ -297,6 +297,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
                 weapons
         };
 
+        //after we save we leave this page and load all the new settings from data
         if(save_index == values.length) {
             save_index = 0;
             Intent intent = new Intent(this, LoadFromDatabase.class);

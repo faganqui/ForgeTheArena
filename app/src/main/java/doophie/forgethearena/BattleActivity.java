@@ -62,6 +62,7 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
 
     Button goToCustomize;
     Button goToBattle;
+    Button goToReforge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,9 +79,11 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
 
         goToBattle = findViewById(R.id.go_to_battle);
         goToCustomize = findViewById(R.id.go_to_customize);
+        goToReforge = findViewById(R.id.go_to_reforge);
 
         goToBattle.setOnClickListener(this);
         goToCustomize.setOnClickListener(this);
+        goToReforge.setOnClickListener(this);
 
     }
 
@@ -107,6 +110,10 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
                 break;
             case R.id.go_to_customize:
                 intent = new Intent(this, CustomizeCharacterActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.go_to_reforge:
+                intent = new Intent(this, ReforgeWeaponActivity.class);
                 startActivity(intent);
                 break;
         }
@@ -209,8 +216,9 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    int randomWithRange(int min, int max)
-    {
+    int randomWithRange(int min, int max) {
+        //returns a random int in the range of min and max
+
         int range = Math.abs(max - min) + 1;
         return (int)(Math.random() * range) + (min <= max ? min : max);
     }
