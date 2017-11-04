@@ -37,5 +37,12 @@
     <string name="lock_elemental_force">Lock\nElemental\nForce</string>
     <string name="lock_elemental_resist">Lock\nElemental\nResist</string>
     <string name="title_activity_purchase_items">PurchaseItemsActivity</string>
+
+
+    <string name="buy_weapons">Buy\n Weapons</string>
+    <string name="buy_amulets">Buy\nAmulets</string>
+    <string name="buy_outfits">Buy\nOutfits</string>
+    <string name="cash_shop">Cash\nShop</string>
+
 </resources>
 

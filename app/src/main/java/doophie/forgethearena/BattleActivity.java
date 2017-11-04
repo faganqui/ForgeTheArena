@@ -63,6 +63,7 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
     Button goToCustomize;
     Button goToBattle;
     Button goToReforge;
+    Button goToShop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,10 +79,12 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
         goToBattle = findViewById(R.id.go_to_battle);
         goToCustomize = findViewById(R.id.go_to_customize);
         goToReforge = findViewById(R.id.go_to_reforge);
+        goToShop = findViewById(R.id.go_to_shop);
 
         goToBattle.setOnClickListener(this);
         goToCustomize.setOnClickListener(this);
         goToReforge.setOnClickListener(this);
+        goToShop.setOnClickListener(this);
 
     }
 

@@ -60,7 +60,7 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
     String[] playerOneWeaponString = new String[3];
     String[] ownedWeapons;
 
-    theGreatDictionaryOfWeapons dict = new theGreatDictionaryOfWeapons();
+    theGreatDictionaryOfWeaponsandOtherStuff dict = new theGreatDictionaryOfWeaponsandOtherStuff();
 
     FirebaseDatabase database;
     String userId;

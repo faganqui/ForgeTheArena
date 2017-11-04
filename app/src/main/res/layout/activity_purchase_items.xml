@@ -1,10 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="doophie.forgethearena.PurchaseItemsActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/header_text"/>
 
-</android.support.design.widget.CoordinatorLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:id="@+id/selection_switcher">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="@string/buy_weapons"
+            android:layout_height="wrap_content"
+            android:onClick="onClick"
+            android:id="@+id/buy_weapons"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="@string/buy_amulets"
+            android:layout_height="wrap_content"
+            android:onClick="onClick"
+            android:id="@+id/buy_amulets"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="@string/buy_outfits"
+            android:layout_height="wrap_content"
+            android:onClick="onClick"
+            android:id="@+id/buy_outfits"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="@string/cash_shop"
+            android:layout_height="wrap_content"
+            android:onClick="onClick"
+            android:id="@+id/cash_shop"/>
+    </LinearLayout>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_weight="9"
+        android:layout_height="0dp"
+        android:id="@+id/shop_table">
+
+    </TableLayout>
+
+</LinearLayout>
