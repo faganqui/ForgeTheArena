@@ -193,6 +193,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     public void buildNewCharacter(){
         //all the default items we give to new characters
+        theGreatDictionaryOfWeaponsandOtherStuff dict = new theGreatDictionaryOfWeaponsandOtherStuff();
 
         //unlocked items
         String ownedWeapons = "axe\\[0,10,15,15,20,15,15,Pi-Ea,Ea\\]sword\\[0,10,15,15,20,15,15,Pi-Ea,Ea\\]mace\\[0,10,15,15,20,15,15,Pi-Ea,Ea";

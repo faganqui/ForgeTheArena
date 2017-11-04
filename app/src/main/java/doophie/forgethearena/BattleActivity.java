@@ -26,6 +26,8 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
     //names for prefs
     private static final String STRING_BACKGROUND = "background";
 
+    private static final String DISPLAY_NAME = "name";
+
     private static final String FIRST_WEAPON = "weapon1";
     private static final String SECOND_WEAPON = "weapon2";
     private static final String THIRD_WEAPON = "weapon3";
@@ -65,16 +67,22 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
     Button goToReforge;
     Button goToShop;
 
+    String name;
+    int money;
+    int level;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_battle);
 
-        Intent recievedIntent = getIntent();
-        String result = recievedIntent.getStringExtra("result");
+        SharedPreferences sharedPref = this.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        name = sharedPref.getString(DISPLAY_NAME, "name");
+        money = Integer.valueOf(sharedPref.getString("moneymoneymoney", "0"));
+        level = (int)(Double.valueOf(sharedPref.getString("playerexp", "0"))/500);
 
         TextView header_text = findViewById(R.id.helloworld);
-        header_text.setText(result);
+        header_text.setText(String.format("User: %s    Money: %d     Level: %d", name, money,level ));
 
         goToBattle = findViewById(R.id.go_to_battle);
         goToCustomize = findViewById(R.id.go_to_customize);
