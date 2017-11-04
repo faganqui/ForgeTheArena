@@ -70,6 +70,9 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
     TextView weaponText;
     TextView resultText;
 
+    //true if a reforged occurred
+    Boolean hasReforged = false;
+
     Button nextWeaponButton;
     Button prevWeaponButton;
     Button reforgeButton;
@@ -290,8 +293,13 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onBackPressed(){
-        Intent intent = new Intent(this, LoadFromDatabase.class);
-        startActivity(intent);
+        if (hasReforged) {
+            Intent intent = new Intent(this, LoadFromDatabase.class);
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(this, BattleActivity.class);
+            startActivity(intent);
+        }
     }
 
     public void confirmReforge(final int index, final String new_weapon_stats,final int bonus){
@@ -355,6 +363,7 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
                     money -= cost;
                     setStat(CURRENCY, String.valueOf(money));
                     reforgeWeapon(selected_weapon);
+                    hasReforged = true;
                 } else {
                     //toast
                     Toast.makeText(getApplicationContext(), "Insufficient funds!", Toast.LENGTH_SHORT).show();

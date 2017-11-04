@@ -1,10 +1,12 @@
 package doophie.forgethearena;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -19,6 +21,12 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Arrays;
+
 public class PurchaseItemsActivity extends AppCompatActivity implements View.OnClickListener {
 
 
@@ -28,6 +36,7 @@ public class PurchaseItemsActivity extends AppCompatActivity implements View.OnC
     private static final String CURRENCY = "moneymoneymoney";
     private static final String OWNED_WEAPONS = "ownedweapons";
     private static final String OWNED_AMULETS = "ownedamulets";
+    private static final String OWNED_OUTFITS = "ownedoutfits";
     private static final String PLAYER_EXPERIENCE = "playerexp";
 
 
@@ -43,6 +52,11 @@ public class PurchaseItemsActivity extends AppCompatActivity implements View.OnC
     String[] all_amulets;
     String[] all_outfits;
     String[] cash_purchases;
+    Boolean made_purchase = false;
+
+    //firbase variables
+    FirebaseDatabase database;
+    String userId;
 
     //set size of drawn character
     private int frameWidth = 100;
@@ -67,9 +81,14 @@ public class PurchaseItemsActivity extends AppCompatActivity implements View.OnC
 
         getSharedPrefs();
 
+        database = FirebaseDatabase.getInstance();
+        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         all_amulets = dict.getAllSomething("amulet");
         all_weapons = dict.getAllSomething("weapon");
         all_outfits = concat(concat(dict.getAllSomething("head"), dict.getAllSomething("body")), dict.getAllSomething("leg"));
+
+        setTable("weapons");
     }
 
     public String[] concat(String[] a, String[] b) {
@@ -103,16 +122,31 @@ public class PurchaseItemsActivity extends AppCompatActivity implements View.OnC
         TableLayout table = findViewById(R.id.shop_table);
         table.removeAllViews();
 
+        TextView header_text = findViewById(R.id.header_text);
+        header_text.setText("Currency : " + money);
+        header_text.setTextColor(Color.BLACK);
+
         String[] list_to_sell = {};
+        String[] list_to_check = {};
         switch (shop_type){
             case "weapons":
                 list_to_sell = all_weapons;
+                list_to_check = owned_weapons;
+                for (int i = 0; i < owned_weapons.length; i++){
+                    list_to_check[i] = owned_weapons[i].split("\\[")[0];
+                }
                 break;
             case "amulets":
                 list_to_sell = all_amulets;
+                list_to_check = owned_amulets;
                 break;
             case "outfits":
                 list_to_sell = all_outfits;
+                String[] temp;
+                for (String bodypart : owned_outfits){
+                    temp = bodypart.split(",");
+                    list_to_check = concat(list_to_check, temp);
+                }
                 break;
             case "cash":
                 list_to_sell = cash_purchases;
@@ -133,13 +167,20 @@ public class PurchaseItemsActivity extends AppCompatActivity implements View.OnC
             item_name.setText(item);
 
             Button purchase_button = new Button(this);
-            purchase_button.setText("Buy\n$" + cost);
-            purchase_button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    makePurchase(item,shop_type,cost);
-                }
-            });
+            if(!Arrays.asList(list_to_check).contains(item)) {
+                purchase_button.setText("Buy\n$" + cost);
+                purchase_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        made_purchase = true;
+                        makePurchase(item, shop_type, cost);
+                        setTable(shop_type);
+                    }
+                });
+            } else {
+                purchase_button.setText("N/A");
+                purchase_button.setBackgroundResource(R.drawable.selectedbuttonback);
+            }
 
             row.addView(purchase_button);
             row.addView(image);
@@ -168,8 +209,71 @@ public class PurchaseItemsActivity extends AppCompatActivity implements View.OnC
         return(drawnBitmap);
     }
 
+    private static String removeLastChar(String str) {
+        return str.substring(0, str.length() - 1);
+    }
+
     public boolean makePurchase(String item, String item_type, int cost){
+        money-=cost;
+        String updated_item_string = "";
+        String stat_string = "";
+
+        switch (item_type) {
+            case "outfits":
+                int body_part = 0;
+                if (Arrays.asList(dict.getAllSomething("head")).contains(item)){
+                    body_part = 2;
+                } else if(Arrays.asList(dict.getAllSomething("body")).contains(item)) {
+                    body_part = 1;
+                }
+                for (int i = 0; i < owned_outfits.length; i++){
+                    if(i == body_part){
+                        updated_item_string += owned_outfits[i] + "," + item + "]";
+                    } else {
+                        updated_item_string += owned_outfits[i] = "]";
+                    }
+                }
+                updated_item_string = removeLastChar(updated_item_string);
+                stat_string = OWNED_OUTFITS;
+                break;
+            case "amulets":
+                for(String amulet : owned_amulets){
+                    updated_item_string += amulet + ":";
+                }
+                updated_item_string += item;
+                stat_string = OWNED_AMULETS;
+                break;
+            case "weapons":
+                for (String weapon : owned_weapons){
+                    updated_item_string += weapon + "]";
+                }
+                updated_item_string += item + "[" + dict.getWeaponBaseStatsAndType(item);
+                break;
+            case "cash":
+                break;
+        }
+
+        setStat(stat_string, updated_item_string);
+        setStat(CURRENCY, String.valueOf(money));
         return false;
+    }
+
+    @Override
+    public void onBackPressed(){
+        if (made_purchase) {
+            Intent intent = new Intent(this, LoadFromDatabase.class);
+            startActivity(intent);
+        }else{
+            Intent intent = new Intent(this, BattleActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    public void setStat(String stat, String value){
+        //places the value in the database under the users "stat" stat
+
+        DatabaseReference statData = database.getReference("/users/" + userId + "/" + stat);
+        statData.setValue(value);
     }
 
     public void getSharedPrefs(){
@@ -179,6 +283,7 @@ public class PurchaseItemsActivity extends AppCompatActivity implements View.OnC
 
         owned_weapons = sharedPref.getString(OWNED_WEAPONS, "").split("]");
         owned_amulets = sharedPref.getString(OWNED_AMULETS, "amulet").split(":");
+        owned_outfits = sharedPref.getString(OWNED_OUTFITS, "").split("\\]");
         money = Integer.valueOf(sharedPref.getString(CURRENCY, "0"));
         exp = Integer.valueOf(sharedPref.getString(PLAYER_EXPERIENCE, "0"));
     }

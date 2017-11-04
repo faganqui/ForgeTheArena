@@ -11,9 +11,9 @@ public class theGreatDictionaryOfWeaponsandOtherStuff {
     // this class just holds all the weapons in the game and their default stat values
 
     private String[] theAlmightyDictionaryWhichIsActuallyAStringArrayButOhWellIUseItLikeADictionairyItsself =
-            {"axe:0,45,30,50,15,15,40",
-            "sword:0,25,20,35,40,60,25",
-            "mace:0,35,20,45,25,40,30"};
+            {"axe:0,45,30,50,15,15,40,Sl-Fi,Fi",
+            "sword:0,25,20,35,40,60,25,Pi-Wa,Wa",
+            "mace:0,35,20,45,25,40,30,Cr-Ea,Ea"};
 
     private String[] allOurAmulets =
             {"amulet"};
@@ -56,10 +56,24 @@ public class theGreatDictionaryOfWeaponsandOtherStuff {
         for (String current_weapon : theAlmightyDictionaryWhichIsActuallyAStringArrayButOhWellIUseItLikeADictionairyItsself){
             if(current_weapon.contains(weapon_to_be_found)){
                 //returns the base stats
+                return removeLastNineChars(current_weapon.split(":")[1]);
+            }
+        }
+        return "error";
+    }
+
+    public String getWeaponBaseStatsAndType(String weapon_to_be_found){
+        for (String current_weapon : theAlmightyDictionaryWhichIsActuallyAStringArrayButOhWellIUseItLikeADictionairyItsself){
+            if(current_weapon.contains(weapon_to_be_found)){
+                //returns the base stats
                 return current_weapon.split(":")[1];
             }
         }
         return "error";
+    }
+
+    private static String removeLastNineChars(String str) {
+        return str.substring(0, str.length() - 9);
     }
 
     public String[] getAllSomething(String something){

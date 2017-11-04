@@ -164,6 +164,9 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
         // Get database instance
         database = FirebaseDatabase.getInstance();
 
+        //set the default interface
+        setOutfitInterface();
+
     }
 
     @Override
@@ -748,7 +751,7 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
             Button gemPrevButton = new Button(this);
 
             gemNextButton.setText("/\\");
-            gemNextButton.setText("/\\");
+            gemPrevButton.setText("\\/");
 
             ImageView gemView = new ImageView(this);
             gemView.setImageBitmap(drawGem(weapon_index));
@@ -824,10 +827,19 @@ public class CustomizeCharacterActivity extends AppCompatActivity implements Vie
             //get new stat value by adding the spent points and the base weapon stats
             new_stat_strings[i] = addStatStrings(playerOneStatString[i], stringPlayerOneSpent[i]);
 
+            //put name of weapon at top
+            TableRow row_name = new TableRow(this);
+            TableRow.LayoutParams lp = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+
+            TextView name = new TextView(this);
+            name.setText(playerOneWeaponLocations[i]);
+
+            row_name.addView(name);
+            tempColumnLayout.addView(row_name);
+
             for(int j = 1; j < statsOrder.length; j++){
                 //for each row
                 TableRow row = new TableRow(this);
-                TableRow.LayoutParams lp = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
                 row.setLayoutParams(lp);
                 row.setGravity(Gravity.CENTER_VERTICAL);
                 //linear layout for the + button and number
