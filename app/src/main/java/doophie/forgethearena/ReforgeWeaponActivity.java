@@ -15,6 +15,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
@@ -42,13 +43,17 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
     private static final String SECOND_WEAPON = "weapon2";
     private static final String THIRD_WEAPON = "weapon3";
 
+    private static final String CURRENCY = "moneymoneymoney";
     private static final String OWNED_WEAPONS = "ownedweapons";
 
     //static variables
     static int randomRangeForForging = 15;
+    private static final String[] statsOrder = {"Durability","Toughness","Power","Speed","Elemental\nForce","Elemental\nResist"};
 
     //variables
     int selected_weapon = 0;
+    Boolean[] is_locked = {false,false,false,false,false,false};
+    int cost = 75;
 
     String[] playerOneStatString = new String[3];
     String[] playerOneWeaponString = new String[3];
@@ -59,6 +64,7 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
     FirebaseDatabase database;
     String userId;
 
+    int money;
     ImageView weaponImage;
     TextView weaponText;
     TextView resultText;
@@ -91,6 +97,8 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
         prevWeaponButton.setOnClickListener(this);
         reforgeButton.setOnClickListener(this);
 
+        reforgeButton.setText("Reforge Weapon, Cost: " + cost);
+
         drawWeapon();
     }
 
@@ -106,7 +114,7 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
 
     public void drawWeapon(){
         //draws the selected weapon to the interface
-        weaponText.setText(ownedWeapons[selected_weapon].split("\\[")[0]);
+        weaponText.setText(ownedWeapons[selected_weapon].split("\\[")[0] + "\n $" + money);
         weaponImage.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         weaponImage.setImageBitmap(drawWeapon(selected_weapon));
     }
@@ -158,22 +166,22 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
         String weapon = ownedWeapons[index];
         String weapon_name = weapon.split("\\[")[0];
         String base_weapon_stats;
-        String new_weapon_stats = "";
+        String new_weapon_stats = "0,";
         int bonus = 0;
 
         base_weapon_stats = dict.getWeaponBaseStats(weapon_name);
 
         int temp_stat;
         int cur_stat;
-        for (String stat : base_weapon_stats.split(",")){
-            cur_stat = Integer.valueOf(stat);
+        for (int i = 0; i <is_locked.length; i ++){
+            cur_stat = Integer.valueOf(base_weapon_stats.split(",")[i+1]);
 
-            if(cur_stat != 0) {
+            if(!is_locked[i]) {
                 temp_stat = cur_stat - randomRangeForForging +
                         randomWithRange(0, randomRangeForForging * 2);
             }else{
                 //first stat is always 0, just cuz
-                temp_stat = 0;
+                temp_stat = Integer.valueOf(weapon.split("\\[")[1].split(",")[i+1]);
             }
 
             bonus += (temp_stat - cur_stat);
@@ -181,6 +189,16 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
             new_weapon_stats += temp_stat + ",";
         }
 
+        confirmReforge(index, new_weapon_stats, bonus);
+
+    }
+
+    public void confirmNewStats(int index, String new_weapon_stats, int bonus){
+
+        String weapon = ownedWeapons[index];
+        String weapon_name = weapon.split("\\[")[0];
+
+        //set the new stats
         ownedWeapons[index] = weapon_name + "[" + new_weapon_stats + ownedWeapons[index].split(",")[7] + "," + ownedWeapons[index].split(",")[8];
 
         for (int i = 0; i < 3; i++){
@@ -233,6 +251,7 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
         playerOneWeaponString[2] = sharedPref.getString(THIRD_WEAPON, "sword");
 
         ownedWeapons = sharedPref.getString(OWNED_WEAPONS, "").split("]");
+        money = Integer.valueOf(sharedPref.getString(CURRENCY, "0"));
     }
 
     public Boolean isDigit(String digit){
@@ -274,19 +293,35 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
         startActivity(intent);
     }
 
-    public void confirmReforge(String results){
-        AlertDialog.Builder adb = new AlertDialog.Builder(this);
+    public void confirmReforge(final int index, final String new_weapon_stats,final int bonus){
+        AlertDialog.Builder adb = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom));
 
         adb.setTitle("Reforge Results");
-        adb.setMessage(results);
-        adb.setIcon(android.R.drawable.ic_dialog_alert);
+
+        int offset = 0;
+
+        String message = "                 old stats:       new stats:\n";
+
+        String old_stats = ownedWeapons[index].split("\\[")[1];
+
+        for (int i = 0; i < statsOrder.length; i++) {
+            if (statsOrder[i].split("\n").length > 1) {
+                offset = 15 - statsOrder[i].split("\n")[1].length();
+            } else {
+                offset = 15 - statsOrder[i].length();
+            }
+
+            message += statsOrder[i]  + new String(new char[offset]).replace("\0", " ") + old_stats.split(",")[i+1] + "          " + new_weapon_stats.split(",")[i+1]+ "\n";
+        }
+
+        adb.setMessage(message);
 
 
         adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
 
                 Toast.makeText(getApplicationContext(), "Reforge Complete!", Toast.LENGTH_SHORT).show();
-                saveWeapon();
+                confirmNewStats(index, new_weapon_stats, bonus);
             } });
 
 
@@ -294,16 +329,25 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
             public void onClick(DialogInterface dialog, int which) {
 
                 Toast.makeText(getApplicationContext(), "Reforge Canceled!", Toast.LENGTH_SHORT).show();
-                finish();
+
             } });
         adb.show();
     }
 
     @Override
     public void onClick(View view){
+        Button thisbutton;
+        Button reforge = findViewById(R.id.reforge_button);
         switch (view.getId()){
             case R.id.reforge_button:
-                reforgeWeapon(selected_weapon);
+                if (money > cost) {
+                    money -= cost;
+                    setStat(CURRENCY, String.valueOf(money));
+                    reforgeWeapon(selected_weapon);
+                } else {
+                    //toast
+                    Toast.makeText(getApplicationContext(), "Insufficient funds!", Toast.LENGTH_SHORT).show();
+                }
                 break;
 
             case R.id.next_weapon_switch:
@@ -313,6 +357,80 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
             case R.id.prev_weapon_switch:
                 changeWeapon(false);
                 break;
+
+            case R.id.lock_duracbility:
+                is_locked[0] = !is_locked[0];
+                thisbutton = findViewById(view.getId());
+                if(is_locked[0]) {
+                    cost = cost*75;
+                    thisbutton.setBackgroundResource(R.drawable.selectedbuttonback);
+                }else{
+                    cost = cost/75;
+                    thisbutton.setBackgroundResource(R.drawable.buttonback);
+                }
+                reforge.setText("Reforge Weapon, Cost: " + cost);
+                break;
+            case R.id.lock_toughness:
+                is_locked[1] = !is_locked[1];
+                thisbutton = findViewById(view.getId());
+                if(is_locked[1]) {
+                    cost = cost*2;
+                    thisbutton.setBackgroundResource(R.drawable.selectedbuttonback);
+                }else{
+                    cost = cost/2;
+                    thisbutton.setBackgroundResource(R.drawable.buttonback);
+                }
+                reforge.setText("Reforge Weapon, Cost: " + cost);
+                break;
+            case R.id.lock_power:
+                is_locked[2] = !is_locked[2];
+                thisbutton = findViewById(view.getId());
+                if(is_locked[2]) {
+                    cost = cost*2;
+                    thisbutton.setBackgroundResource(R.drawable.selectedbuttonback);
+                }else{
+                    cost = cost/2;
+                    thisbutton.setBackgroundResource(R.drawable.buttonback);
+                }
+                reforge.setText("Reforge Weapon, Cost: " + cost);
+                break;
+            case R.id.lock_speed:
+                is_locked[3] = !is_locked[3];
+                thisbutton = findViewById(view.getId());
+                if(is_locked[3]) {
+                    cost = cost*2;
+                    thisbutton.setBackgroundResource(R.drawable.selectedbuttonback);
+                }else{
+                    cost = cost/2;
+                    thisbutton.setBackgroundResource(R.drawable.buttonback);
+                }
+                reforge.setText("Reforge Weapon, Cost: " + cost);
+                break;
+            case R.id.lock_elemental_force:
+                is_locked[4] = !is_locked[4];
+                thisbutton = findViewById(view.getId());
+                if(is_locked[4]) {
+                    cost = cost*2;
+                    thisbutton.setBackgroundResource(R.drawable.selectedbuttonback);
+                }else{
+                    cost = cost/2;
+                    thisbutton.setBackgroundResource(R.drawable.buttonback);
+                }
+                reforge.setText("Reforge Weapon, Cost: " + cost);
+                break;
+            case R.id.lock_elemental_resist:
+                is_locked[5] = !is_locked[5];
+                thisbutton = findViewById(view.getId());
+                if(is_locked[5]) {
+                    cost = cost*2;
+                    thisbutton.setBackgroundResource(R.drawable.selectedbuttonback);
+                }else{
+                    cost = cost/2;
+                    thisbutton.setBackgroundResource(R.drawable.buttonback);
+                }
+                reforge.setText("Reforge Weapon, Cost: " + cost);
+                break;
+
         }
     }
 }

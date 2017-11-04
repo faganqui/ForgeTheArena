@@ -54,6 +54,7 @@ public class LoadFromDatabase extends AppCompatActivity {
 
     private static final String OWNED_WEAPONS = "ownedweapons";
     private static final String AVAILIBLE_CURRENCY = "moneymoneymoney";
+    private static final String PLAYER_EXPERIENCE = "playerexp";
 
     String[] stat_array = new String[20];
 
@@ -109,6 +110,7 @@ public class LoadFromDatabase extends AppCompatActivity {
         stat_array[17] = OWNED_WEAPONS;
         stat_array[18] = AVAILIBLE_CURRENCY;
         stat_array[19] = OWNED_OUTFITS;
+        stat_array[20] = PLAYER_EXPERIENCE;
 
         collectAllData();
 
@@ -145,6 +147,11 @@ public class LoadFromDatabase extends AppCompatActivity {
     public void finishLoading(){
         Intent battle = new Intent(getBaseContext(), BattleActivity.class);
         startActivity(battle);
+    }
+
+    @Override
+    public void onBackPressed(){
+        //do nothing - makes it so nobody can stop the load from server from happening
     }
 
     public void getStat(String stat){

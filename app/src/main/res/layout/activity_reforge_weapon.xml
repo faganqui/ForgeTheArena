@@ -51,6 +51,43 @@
 
     </LinearLayout>
 
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <TableRow>
+            <Button
+                android:text="@string/lock_durability"
+                android:id="@+id/lock_duracbility"
+                android:onClick="onClick"/>
+            <Button
+                android:text="@string/lock_toughness"
+                android:onClick="onClick"
+                android:id="@+id/lock_toughness"/>
+            <Button
+                android:text="@string/lock_power"
+                android:onClick="onClick"
+                android:id="@+id/lock_power"/>
+        </TableRow>
+
+        <TableRow>
+            <Button
+                android:text="@string/lock_speed"
+                android:onClick="onClick"
+                android:id="@+id/lock_speed"/>
+            <Button
+                android:text="@string/lock_elemental_force"
+                android:onClick="onClick"
+                android:id="@+id/lock_elemental_force"/>
+            <Button
+                android:text="@string/lock_elemental_resist"
+                android:onClick="onClick"
+                android:id="@+id/lock_elemental_resist"/>
+        </TableRow>
+
+    </TableLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

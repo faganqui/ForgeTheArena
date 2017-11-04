@@ -24,5 +24,12 @@
     <string name="go_to_battle_text">Go To Battle</string>
     <string name="go_to_customize_screen">Customize Character</string>
     <string name="title_activity_reforge_weapon">ReforgeWeaponActivity</string>
+
+    <string name="lock_durability">Lock\nDurabiliy</string>
+    <string name="lock_toughness">Lock\nToughtness</string>
+    <string name="lock_power">Lock\nPower</string>
+    <string name="lock_speed">Lock\nSpeed</string>
+    <string name="lock_elemental_force">Lock\nElemental\nForce</string>
+    <string name="lock_elemental_resist">Lock\nElemental\nResist</string>
 </resources>
 

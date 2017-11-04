@@ -31,10 +31,19 @@
 
     <style name="RobotoButtonStyle" parent="android:Widget.Holo.Button">
         <item name="android:fontFamily">sans-serif-smallcaps</item>
+        <item name="android:background">@drawable/buttonback</item>
     </style>
 
     <style name="RobotoEditTextStyle" parent="android:Widget.EditText">
         <item name="android:fontFamily">sans-serif-smallcaps</item>
+    </style>
+
+    <style name="AlertDialogCustom" parent="@android:style/Theme.DeviceDefault.Dialog">
+        <item name="android:textColor">#161e16</item>
+        <item name="android:background">#cf1b1b</item>
+        <item name="android:typeface">monospace</item>
+        <item name="android:fontFamily">sans-serif-smallcaps</item>
+
     </style>
 
 </resources>
