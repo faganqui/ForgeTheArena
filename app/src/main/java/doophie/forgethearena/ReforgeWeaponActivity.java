@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -294,14 +295,42 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
     }
 
     public void confirmReforge(final int index, final String new_weapon_stats,final int bonus){
-        AlertDialog.Builder adb = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom));
 
-        adb.setTitle("Reforge Results");
+        AlertDialog dialog = new AlertDialog.Builder(ReforgeWeaponActivity.this)
+                .setTitle("Reforge Results")
+                .setMessage(makeMessage(index, new_weapon_stats))
+                .setCancelable(true)
+                .setPositiveButton("Confirm Reforge", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(), "Reforge Complete!", Toast.LENGTH_SHORT).show();
+                        confirmNewStats(index, new_weapon_stats, bonus);
+                    }
 
+                })
+                .setNegativeButton("Trash Reforge", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+
+                    }
+
+                }).show();
+
+        TextView textView = (TextView) dialog.findViewById(android.R.id.message);
+        textView.setTypeface(Typeface.MONOSPACE);
+
+        Button btn1 = (Button) dialog.findViewById(android.R.id.button1);
+        btn1.setTextColor(Color.BLACK);
+
+        Button btn2 = (Button) dialog.findViewById(android.R.id.button2);
+        btn2.setTextColor(Color.BLACK);
+
+    }
+
+    public String makeMessage(int index, String new_weapon_stats){
         int offset = 0;
-
-        String message = "                 old stats:       new stats:\n";
-
+        String message = "            old:       new:\n";
         String old_stats = ownedWeapons[index].split("\\[")[1];
 
         for (int i = 0; i < statsOrder.length; i++) {
@@ -311,27 +340,9 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
                 offset = 15 - statsOrder[i].length();
             }
 
-            message += statsOrder[i]  + new String(new char[offset]).replace("\0", " ") + old_stats.split(",")[i+1] + "          " + new_weapon_stats.split(",")[i+1]+ "\n";
+            message += statsOrder[i]  + new String(new char[offset]).replace("\0", " ") + old_stats.split(",")[i+1] + "          " + new_weapon_stats.split(",")[i+1]+ "\n\n";
         }
-
-        adb.setMessage(message);
-
-
-        adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-
-                Toast.makeText(getApplicationContext(), "Reforge Complete!", Toast.LENGTH_SHORT).show();
-                confirmNewStats(index, new_weapon_stats, bonus);
-            } });
-
-
-        adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-
-                Toast.makeText(getApplicationContext(), "Reforge Canceled!", Toast.LENGTH_SHORT).show();
-
-            } });
-        adb.show();
+        return message;
     }
 
     @Override
@@ -362,10 +373,10 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
                 is_locked[0] = !is_locked[0];
                 thisbutton = findViewById(view.getId());
                 if(is_locked[0]) {
-                    cost = cost*75;
+                    cost = cost*2;
                     thisbutton.setBackgroundResource(R.drawable.selectedbuttonback);
                 }else{
-                    cost = cost/75;
+                    cost = cost/2;
                     thisbutton.setBackgroundResource(R.drawable.buttonback);
                 }
                 reforge.setText("Reforge Weapon, Cost: " + cost);

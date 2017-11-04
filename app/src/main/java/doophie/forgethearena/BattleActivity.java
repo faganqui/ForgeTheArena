@@ -72,10 +72,8 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
         Intent recievedIntent = getIntent();
         String result = recievedIntent.getStringExtra("result");
 
-        if (result != null) {
-            TextView helloworld = (TextView) findViewById(R.id.helloworld);
-            helloworld.setText(result);
-        }
+        TextView header_text = findViewById(R.id.helloworld);
+        header_text.setText(result);
 
         goToBattle = findViewById(R.id.go_to_battle);
         goToCustomize = findViewById(R.id.go_to_customize);
@@ -115,6 +113,16 @@ public class BattleActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.go_to_reforge:
                 intent = new Intent(this, ReforgeWeaponActivity.class);
                 startActivity(intent);
+                break;
+            case R.id.go_to_shop:
+                intent = new Intent(this, PurchaseItemsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.go_to_leaderboard:
+                //todo
+                break;
+            case R.id.go_to_pvp:
+                //todo
                 break;
         }
 

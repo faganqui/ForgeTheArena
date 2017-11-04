@@ -56,7 +56,7 @@ public class LoadFromDatabase extends AppCompatActivity {
     private static final String AVAILIBLE_CURRENCY = "moneymoneymoney";
     private static final String PLAYER_EXPERIENCE = "playerexp";
 
-    String[] stat_array = new String[20];
+    String[] stat_array = new String[21];
 
     //get database objects
     FirebaseDatabase database;

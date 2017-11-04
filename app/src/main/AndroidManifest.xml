@@ -51,6 +51,10 @@
         <activity
             android:name=".ReforgeWeaponActivity"
             android:label="@string/title_activity_reforge_weapon"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PurchaseItemsActivity"
+            android:label="@string/title_activity_purchase_items"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

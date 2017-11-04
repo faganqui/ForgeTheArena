@@ -106,6 +106,8 @@ public class SpriteSheetAnimation extends Activity {
         private static final String SECOND_ENEMY_WEAPON_STATS = "enemystats2";
         private static final String THIRD_ENEMY_WEAPON_STATS = "enemystats3";
 
+        private static final String PLAYER_EXPERIENCE = "playerexp";
+
 
         // This is new. We need a SurfaceHolder
         // When we use Paint and Canvas in a thread
@@ -153,6 +155,7 @@ public class SpriteSheetAnimation extends Activity {
         String playerOneName = "";
         String playerTwoString = "";
         String money;
+        String experience;
 
         // Bitmaps for enemy - we load this first, because chivalry
         String[] stringPlayerTwo = new String[3];
@@ -456,6 +459,7 @@ public class SpriteSheetAnimation extends Activity {
                 //won wooo
                 //todo: write this
                 setStat("moneymoneymoney", String.valueOf(Integer.valueOf(money) + 75));
+                setStat(PLAYER_EXPERIENCE, String.valueOf(Integer.valueOf(experience) + 75));
 
                 Intent intent = new Intent(getContext(), LoadFromDatabase.class);
                 intent.putExtra("result", "won");
@@ -887,6 +891,8 @@ public class SpriteSheetAnimation extends Activity {
             playerTwoStatString[0] = sharedPref.getString(FIRST_ENEMY_WEAPON_STATS, "sword");
             playerTwoStatString[1] = sharedPref.getString(SECOND_ENEMY_WEAPON_STATS, "sword");
             playerTwoStatString[2] = sharedPref.getString(THIRD_ENEMY_WEAPON_STATS, "sword");
+
+            experience = sharedPref.getString(PLAYER_EXPERIENCE, "0");
         }
 
         // If SimpleGameEngine Activity is paused/stopped

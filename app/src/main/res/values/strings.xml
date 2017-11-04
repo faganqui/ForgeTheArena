@@ -23,6 +23,11 @@
 
     <string name="go_to_battle_text">Go To Battle</string>
     <string name="go_to_customize_screen">Customize Character</string>
+    <string name="go_to_pvp_text">Go To Battle\n(PvP)</string>
+    <string name="go_to_leaderboard">View Leaderboard</string>
+    <string name="go_to_shop">Go To Shop</string>
+    <string name="go_to_reforge">Reforge Weapon</string>
+
     <string name="title_activity_reforge_weapon">ReforgeWeaponActivity</string>
 
     <string name="lock_durability">Lock\nDurabiliy</string>
@@ -31,5 +36,6 @@
     <string name="lock_speed">Lock\nSpeed</string>
     <string name="lock_elemental_force">Lock\nElemental\nForce</string>
     <string name="lock_elemental_resist">Lock\nElemental\nResist</string>
+    <string name="title_activity_purchase_items">PurchaseItemsActivity</string>
 </resources>
 
