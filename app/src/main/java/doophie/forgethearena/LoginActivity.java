@@ -196,14 +196,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         theGreatDictionaryOfWeaponsandOtherStuff dict = new theGreatDictionaryOfWeaponsandOtherStuff();
 
         //unlocked items
-        String ownedWeapons = "axe\\[0,10,15,15,20,15,15,Pi-Ea,Ea\\]sword\\[0,10,15,15,20,15,15,Pi-Ea,Ea\\]mace\\[0,10,15,15,20,15,15,Pi-Ea,Ea";
-        String ownedOutfits = "legs,legs2\\]body,body2\\]head,head2,head3";
+        String base_stats = dict.getWeaponBaseStatsAndType("sword");
+        String ownedWeapons = String.format("sword[%s]sword[%s]sword[%s", base_stats, base_stats, base_stats);
+        String ownedOutfits = "legs]body]head";
 
         //User stats
-        String[] playerOneStatString = {"0,10,15,15,20,15,15,Pi-Ea,Ea","0,10,15,15,20,15,15,Pi-Ea,Ea","0,10,15,15,20,15,15,Pi-Ea,Ea"};
-        String[] playerOneWeaponLocations = {"sword","axe","mace"};
+        String[] playerOneStatString = {base_stats, base_stats, base_stats};
+        String[] playerOneWeaponLocations = {"sword","sword", "sword"};
         String[] stringPlayerOne = {"legs","body","head"};
-        String[] stringGem = {"gem1","gem2","gem3"};
+        String[] stringGem = {"gemwater","gemwater","gemwater"};
         String stringAmulet = "amulet";
 
         String uId = FirebaseAuth.getInstance().getCurrentUser().getUid();

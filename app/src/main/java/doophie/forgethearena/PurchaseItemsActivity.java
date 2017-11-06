@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -131,9 +132,9 @@ public class PurchaseItemsActivity extends AppCompatActivity implements View.OnC
         switch (shop_type){
             case "weapons":
                 list_to_sell = all_weapons;
-                list_to_check = owned_weapons;
+                list_to_check = concat(owned_weapons, list_to_check);
                 for (int i = 0; i < owned_weapons.length; i++){
-                    list_to_check[i] = owned_weapons[i].split("\\[")[0];
+                    list_to_check[i] = list_to_check[i].split("\\[")[0];
                 }
                 break;
             case "amulets":
@@ -174,7 +175,6 @@ public class PurchaseItemsActivity extends AppCompatActivity implements View.OnC
                     public void onClick(View v) {
                         made_purchase = true;
                         makePurchase(item, shop_type, cost);
-                        setTable(shop_type);
                     }
                 });
             } else {
@@ -214,48 +214,58 @@ public class PurchaseItemsActivity extends AppCompatActivity implements View.OnC
     }
 
     public boolean makePurchase(String item, String item_type, int cost){
-        money-=cost;
-        String updated_item_string = "";
-        String stat_string = "";
+        if(money >= cost) {
+            money -= cost;
+            String updated_item_string = "";
+            String stat_string = "";
 
-        switch (item_type) {
-            case "outfits":
-                int body_part = 0;
-                if (Arrays.asList(dict.getAllSomething("head")).contains(item)){
-                    body_part = 2;
-                } else if(Arrays.asList(dict.getAllSomething("body")).contains(item)) {
-                    body_part = 1;
-                }
-                for (int i = 0; i < owned_outfits.length; i++){
-                    if(i == body_part){
-                        updated_item_string += owned_outfits[i] + "," + item + "]";
-                    } else {
-                        updated_item_string += owned_outfits[i] = "]";
+            switch (item_type) {
+                case "outfits":
+                    int body_part = 0;
+                    if (Arrays.asList(dict.getAllSomething("head")).contains(item)) {
+                        body_part = 2;
+                    } else if (Arrays.asList(dict.getAllSomething("body")).contains(item)) {
+                        body_part = 1;
                     }
-                }
-                updated_item_string = removeLastChar(updated_item_string);
-                stat_string = OWNED_OUTFITS;
-                break;
-            case "amulets":
-                for(String amulet : owned_amulets){
-                    updated_item_string += amulet + ":";
-                }
-                updated_item_string += item;
-                stat_string = OWNED_AMULETS;
-                break;
-            case "weapons":
-                for (String weapon : owned_weapons){
-                    updated_item_string += weapon + "]";
-                }
-                updated_item_string += item + "[" + dict.getWeaponBaseStatsAndType(item);
-                break;
-            case "cash":
-                break;
-        }
+                    for (int i = 0; i < owned_outfits.length; i++) {
+                        if (i == body_part) {
+                            updated_item_string += owned_outfits[i] + "," + item + "]";
+                        } else {
+                            updated_item_string += owned_outfits[i] + "]";
+                        }
+                    }
+                    updated_item_string = removeLastChar(updated_item_string);
+                    owned_outfits = updated_item_string.split("\\]");
+                    stat_string = OWNED_OUTFITS;
+                    break;
+                case "amulets":
+                    for (String amulet : owned_amulets) {
+                        updated_item_string += amulet + ":";
+                    }
+                    updated_item_string += item;
+                    stat_string = OWNED_AMULETS;
+                    owned_amulets = updated_item_string.split(":");
+                    break;
+                case "weapons":
+                    for (String weapon : owned_weapons) {
+                        updated_item_string += weapon + "]";
+                    }
+                    updated_item_string += item + "[" + dict.getWeaponBaseStatsAndType(item);
+                    stat_string = OWNED_WEAPONS;
+                    owned_weapons = updated_item_string.split("\\]");
+                    break;
+                case "cash":
+                    break;
+            }
 
-        setStat(stat_string, updated_item_string);
-        setStat(CURRENCY, String.valueOf(money));
-        return false;
+            setStat(stat_string, updated_item_string);
+            setStat(CURRENCY, String.valueOf(money));
+            setTable(item_type);
+            return true;
+        } else {
+            Toast.makeText(getApplicationContext(), "Insufficient Funds!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
     }
 
     @Override

@@ -148,8 +148,8 @@ public class SpriteSheetAnimation extends Activity {
         String[] playerTwoStatString = new String[3];
 
         //gem colours
-        Color[] playerGems;
-        Color[] enemyGems;
+        int[] playerGems = new int[3];
+        int[] enemyGems = new int[3];
 
         //other stuff
         String playerOneName = "";
@@ -702,7 +702,7 @@ public class SpriteSheetAnimation extends Activity {
 
                     //draw gem attacks
                     if(isGemming){
-                        paint.setColorFilter(new PorterDuffColorFilter(Color.BLUE, PorterDuff.Mode.SRC_IN));
+                        paint.setColorFilter(new PorterDuffColorFilter(playerGems[selectedWeapon], PorterDuff.Mode.SRC_IN));
 
                         whereToDraw.set((int) playerXPosition + (attackCount * 50),
                                 (int)playerYPosition - (attackCount * 50),
@@ -715,7 +715,7 @@ public class SpriteSheetAnimation extends Activity {
                     }
 
                     if(isEnemyGemming){
-                        paint.setColorFilter(new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.SRC_IN));
+                        paint.setColorFilter(new PorterDuffColorFilter(enemyGems[selectedEnemyWeapon], PorterDuff.Mode.SRC_IN));
 
                         whereToDraw.set((int)enemyXPosition - (attackCount * 50),
                                 (int)enemyYPosition + (attackCount * 50),
@@ -892,7 +892,42 @@ public class SpriteSheetAnimation extends Activity {
             playerTwoStatString[1] = sharedPref.getString(SECOND_ENEMY_WEAPON_STATS, "sword");
             playerTwoStatString[2] = sharedPref.getString(THIRD_ENEMY_WEAPON_STATS, "sword");
 
+            getGemColours();
+
             experience = sharedPref.getString(PLAYER_EXPERIENCE, "0");
+        }
+
+        public void getGemColours(){
+            //sets what colour gem attacks should be based on weapon elements
+            int count = 0;
+            for (String gem : stringGem) {
+                //set colours for player gem attack
+                if(gem.contains("light")){
+                    playerGems[count] = Color.WHITE;
+                }else if(gem.contains("dark")){
+                    playerGems[count] = Color.BLACK;
+                }else if(gem.contains("earth")){
+                    playerGems[count] = Color.GREEN;
+                }else if(gem.contains("fire")){
+                    playerGems[count] = Color.RED;
+                }else{
+                    playerGems[count] = Color.BLUE;
+                }
+
+                //and for enemy attacks
+                if(playerTwoStatString[count].contains("Li")){
+                    enemyGems[count] = Color.WHITE;
+                }else if(playerTwoStatString[count].contains("Da")){
+                    enemyGems[count] = Color.BLACK;
+                }else if(playerTwoStatString[count].contains("Ea")){
+                    enemyGems[count] = Color.GREEN;
+                }else if(playerTwoStatString[count].contains("Fi")){
+                    enemyGems[count] = Color.RED;
+                }else if(playerTwoStatString[count].contains("Wa")){
+                    enemyGems[count] = Color.BLUE;
+                }
+                count++;
+            }
         }
 
         // If SimpleGameEngine Activity is paused/stopped

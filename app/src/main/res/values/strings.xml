@@ -2,7 +2,7 @@
     <string name="app_name">ForgetheArena</string>
     <string name="title_activity_sprite_sheet_animation">SpriteSheetAnimation</string>
     <string name="title_activity_handle_sign_in">HandleSignIn</string>
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_login">Forge the Arena</string>
 
     <string name="auth_failed">authorization failed</string>
     <string name="sign_in">Sign In</string>

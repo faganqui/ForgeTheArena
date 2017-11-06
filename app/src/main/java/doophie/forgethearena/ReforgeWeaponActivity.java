@@ -319,7 +319,7 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
                 .setNegativeButton("Trash Reforge", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        Toast.makeText(getApplicationContext(), "Reforge Trashed!", Toast.LENGTH_SHORT).show();
 
                     }
 
@@ -359,7 +359,7 @@ public class ReforgeWeaponActivity extends AppCompatActivity implements View.OnC
         Button reforge = findViewById(R.id.reforge_button);
         switch (view.getId()){
             case R.id.reforge_button:
-                if (money > cost) {
+                if (money >= cost) {
                     money -= cost;
                     setStat(CURRENCY, String.valueOf(money));
                     reforgeWeapon(selected_weapon);
